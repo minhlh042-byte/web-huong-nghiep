@@ -360,7 +360,7 @@ async function callGeminiAnalysis() {
         - Tên: ${userProfile.name}, ${userProfile.age} tuổi, giới tính ${userProfile.gender}.
         - Kết quả trắc nghiệm Holland (RIASEC) nổi trội ở các nhóm: ${topGroups || "Chưa rõ rệt"}.
         
-        Hãy viết một báo cáo ngắn (định dạng HTML cơ bản, không dùng markdown ```html) gồm:
+        Hãy viết một báo cáo ngắn (định dạng HTML cơ bản, tuyệt đối không bọc trong thẻ code block) gồm:
         1. <b>Tính cách nổi bật:</b> Nhận xét dựa trên nhóm ${topGroups}.
         2. <b>Môi trường làm việc phù hợp:</b> Mô tả không gian làm việc.
         3. <b>Top 5 nghề nghiệp gợi ý:</b> Liệt kê cụ thể.
@@ -436,4 +436,5 @@ function toggleDetails() {
 </script>
 
 </body>
+
 </html>
