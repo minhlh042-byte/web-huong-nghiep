@@ -2,99 +2,181 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trắc nghiệm Định hướng Nghề nghiệp AI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Trắc nghiệm Hướng nghiệp AI</title>
     <style>
-        /* --- CSS CHUNG --- */
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; text-align: center; color: #333; }
-        .container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        /* --- 1. CSS CHUNG & RESET --- */
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: #f0f2f5; margin: 0; padding: 10px; 
+            text-align: center; color: #333; 
+            overflow-x: hidden; /* Chặn cuộn ngang khi vuốt */
+            overscroll-behavior: none; /* Chặn kéo trang trên mobile */
+        }
         
-        /* --- HIỆU ỨNG LOGO --- */
+        /* Container chính */
+        .container { 
+            max-width: 480px; margin: 0 auto; 
+            background: white; padding: 20px; 
+            border-radius: 20px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+            min-height: 85vh; 
+            display: flex; flex-direction: column; 
+            position: relative;
+        }
+
+        /* --- 2. LOGO & HEADER --- */
         #company-logo { 
-            max-width: 150px; display: block; margin: 0 auto 20px; 
-            animation: logoBounceIn 1.2s cubic-bezier(0.68, -0.55, 0.27, 1.55) both;
+            max-width: 120px; display: block; margin: 0 auto 10px; 
+            animation: bounceIn 1s;
         }
-        @keyframes logoBounceIn {
-            0% { opacity: 0; transform: scale(0.3) translateY(-100px); }
-            50% { opacity: 1; transform: scale(1.1); }
-            100% { transform: scale(1); translateY(0); }
-        }
+        @keyframes bounceIn { 0%{transform:scale(0);} 60%{transform:scale(1.1);} 100%{transform:scale(1);} }
 
-        /* --- INPUT FORM --- */
+        h2 { margin: 10px 0; color: #2c3e50; }
+
+        /* --- 3. FORM NHẬP LIỆU --- */
         .form-group { margin-bottom: 15px; text-align: left; }
-        label { font-weight: bold; display: block; margin-bottom: 5px; }
-        input[type="text"], input[type="number"], input[type="email"] { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 14px; }
-        .gender-options { display: flex; gap: 10px; }
-        .gender-btn { flex: 1; padding: 10px; border: 1px solid #ddd; background: #f9f9f9; cursor: pointer; border-radius: 8px; transition: 0.2s; }
-        .gender-btn.active { background: #007bff; color: white; border-color: #007bff; font-weight: bold; }
+        label { font-weight: bold; font-size: 0.9em; margin-bottom: 5px; display: block; color: #555; }
         
-        .btn-primary { width: 100%; padding: 14px; background: #28a745; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; margin-top: 10px; transition: 0.3s; font-weight: bold; }
-        .btn-primary:hover { background: #218838; transform: translateY(-2px); }
-        .btn-primary:disabled { background: #ccc; cursor: not-allowed; transform: none; }
-
-        /* --- CARD & FLIP EFFECT --- */
-        #card-container { perspective: 1000px; height: 450px; position: relative; margin-top: 20px; display: none; }
-        .card-wrapper {
-            width: 100%; height: 100%; position: absolute;
-            transform-style: preserve-3d; transition: transform 0.6s; cursor: pointer;
+        input[type="text"], input[type="number"], input[type="email"] { 
+            width: 100%; padding: 12px; border: 1px solid #ddd; 
+            border-radius: 10px; box-sizing: border-box; font-size: 16px;
         }
-        .card-wrapper.is-flipped { transform: rotateY(180deg); }
         
+        .gender-options { display: flex; gap: 10px; }
+        .gender-btn { 
+            flex: 1; padding: 12px; border: 1px solid #eee; 
+            background: #f9f9f9; cursor: pointer; border-radius: 8px; 
+            font-weight: 600; text-align: center; transition: 0.2s;
+        }
+        .gender-btn.active { background: #007bff; color: white; border-color: #007bff; }
+        
+        .btn-primary { 
+            width: 100%; padding: 15px; background: #28a745; 
+            color: white; border: none; border-radius: 30px; 
+            font-size: 16px; font-weight: bold; cursor: pointer; 
+            margin-top: 10px; box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+            transition: transform 0.2s;
+        }
+        .btn-primary:active { transform: scale(0.98); }
+
+        /* --- 4. KHUNG THẺ TINDER (SWIPE CARD) --- */
+        #quiz-screen { 
+            position: relative; height: 550px; 
+            display: none; flex-direction: column; 
+        }
+        
+        #card-container { 
+            position: relative; width: 100%; flex-grow: 1; margin-top: 10px; 
+            perspective: 1000px;
+        }
+        
+        .card-wrapper {
+            position: absolute; width: 100%; height: 100%; top: 0; left: 0;
+            background: white; border-radius: 20px; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            transform-origin: 50% 100%; /* Xoay từ đáy */
+            cursor: grab;
+            transition: transform 0.1s linear; /* Mặc định nhanh để vuốt mượt */
+            display: flex; flex-direction: column; overflow: hidden;
+        }
+        
+        /* Hiệu ứng lật mặt sau */
+        .card-wrapper.is-flipped .card-face.front { transform: rotateY(180deg); }
+        .card-wrapper.is-flipped .card-face.back { transform: rotateY(0deg); z-index: 10; }
+
         .card-face {
             position: absolute; width: 100%; height: 100%;
-            backface-visibility: hidden; border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
-            display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
-            background: white; padding: 20px; box-sizing: border-box; overflow: hidden;
+            backface-visibility: hidden; transition: transform 0.6s;
+            background: white; top: 0; left: 0;
         }
-        .card-face.back { transform: rotateY(180deg); background: #f8f9fa; color: #333; justify-content: center; }
+
+        /* --- MẶT TRƯỚC --- */
+        .card-face.front { z-index: 2; transform: rotateY(0deg); }
+        .card-face.front img { width: 100%; height: 100%; object-fit: cover; }
         
-        /* Chỉnh ảnh hiển thị gọn đẹp */
-        .card-image-wrapper { width: 100%; height: 280px; overflow: hidden; border-radius: 10px; margin-bottom: 15px; }
-        .card-face img { width: 100%; height: 100%; object-fit: cover; }
-        .card-face h3 { margin: 10px 0 5px; font-size: 1.2em; color: #007bff; }
+        .text-overlay {
+            position: absolute; bottom: 0; left: 0; width: 100%; 
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+            padding: 20px; padding-top: 60px; box-sizing: border-box; text-align: left;
+            color: white;
+        }
+        .job-vn { font-size: 26px; font-weight: 800; margin: 0; line-height: 1.2; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .job-en { font-size: 16px; font-weight: 400; opacity: 0.9; margin-top: 4px; font-style: italic; color: #ddd; }
+        .tap-hint { font-size: 12px; color: rgba(255,255,255,0.7); margin-top: 10px; text-transform: uppercase; letter-spacing: 1px; }
 
-        /* Animation chia bài */
-        .deal-animation { animation: dealCard 0.5s ease-out forwards; }
-        @keyframes dealCard { from { opacity: 0; transform: translateY(-50px) scale(0.8); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        /* --- MẶT SAU --- */
+        .card-face.back { 
+            transform: rotateY(-180deg); z-index: 1; 
+            display: flex; flex-direction: column;
+            background: #fff;
+        }
+        .back-header { 
+            background: #f8f9fa; padding: 15px; 
+            border-bottom: 1px solid #eee; z-index: 5; 
+            display: flex; align-items: center; gap: 15px;
+        }
+        .back-content { 
+            padding: 15px; text-align: left; font-size: 0.95em; 
+            color: #444; line-height: 1.6; overflow-y: auto; flex-grow: 1;
+        }
+        
+        /* Các mục nội dung mặt sau */
+        .section-title { color: #007bff; font-weight: bold; font-size: 0.95em; margin-top: 15px; display: block; border-left: 3px solid #007bff; padding-left: 8px; }
+        .fun-fact { background: #fff3cd; padding: 12px; border-radius: 8px; font-style: italic; font-size: 0.9em; margin-top: 20px; border: 1px dashed #ffc107; }
 
-        /* Nút chọn */
-        .choice-buttons { margin-top: 20px; display: none; justify-content: center; gap: 30px; }
-        .btn-choice { width: 130px; padding: 12px; border-radius: 30px; border: none; cursor: pointer; font-weight: bold; font-size: 16px; transition: transform 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .btn-yes { background: #4caf50; color: white; }
-        .btn-no { background: #f44336; color: white; }
-        .btn-choice:active { transform: scale(0.95); }
+        /* --- 5. NÚT BẤM TRÒN --- */
+        .choice-buttons { 
+            margin-top: 15px; display: flex; justify-content: center; gap: 40px; 
+            padding-bottom: 10px; 
+        }
+        .btn-wrapper { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        
+        .btn-circle {
+            width: 65px; height: 65px; border-radius: 50%; border: none; 
+            display: flex; justify-content: center; align-items: center;
+            font-size: 28px; cursor: pointer; 
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            background: white; transition: transform 0.2s, background 0.2s;
+        }
+        .btn-circle:active { transform: scale(0.9); }
+        .btn-no { color: #ff4757; border: 2px solid #ff4757; }
+        .btn-no:hover { background: #ffe0e3; }
+        .btn-yes { color: #2ed573; border: 2px solid #2ed573; }
+        .btn-yes:hover { background: #dcffe4; }
+        .btn-label { font-size: 12px; font-weight: bold; color: #666; }
 
-        /* --- KẾT QUẢ --- */
+        /* Animation khi vuốt bay màu */
+        .fly-left { transition: 0.5s !important; transform: translateX(-150%) rotate(-30deg) !important; opacity: 0; }
+        .fly-right { transition: 0.5s !important; transform: translateX(150%) rotate(30deg) !important; opacity: 0; }
+
+        /* --- 6. PHẦN KẾT QUẢ --- */
         #result-section { display: none; text-align: left; animation: fadeIn 0.5s; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         
-        .ai-loading { text-align: center; color: #666; font-style: italic; padding: 20px; background: #f8f9fa; border-radius: 10px; }
-        .result-box { background: #e9ecef; padding: 15px; border-radius: 10px; margin-bottom: 15px; font-size: 0.95em; }
-        .toggle-btn { background: #17a2b8; color: white; padding: 10px; border: none; width: 100%; border-radius: 5px; cursor: pointer; margin-top: 10px; font-weight: bold; }
-        .hidden-content { display: none; margin-top: 10px; padding: 15px; border: 1px dashed #ccc; background: #fff; border-radius: 5px; }
+        .result-box { background: #e9ecef; padding: 15px; border-radius: 10px; margin-bottom: 15px; }
+        .ai-loading { text-align: center; color: #666; padding: 20px; background: #f8f9fa; border-radius: 10px; border: 1px solid #eee; }
         
-        .email-note { font-size: 0.8em; color: #d9534f; margin-top: 8px; font-style: italic; text-align: center; display: block;}
-        
-        /* Loading overlay khi tải dữ liệu */
-        #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; display: flex; justify-content: center; align-items: center; flex-direction: column; }
-        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 10px; }
+        /* Spinner Loading */
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 0 auto 10px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); z-index: 9999; display: flex; justify-content: center; align-items: center; flex-direction: column; }
     </style>
 </head>
 <body>
 
 <div id="loading-overlay">
     <div class="spinner"></div>
-    <p>Đang tải dữ liệu từ máy chủ...</p>
+    <p>Đang tải dữ liệu nghề nghiệp...</p>
 </div>
 
 <div class="container">
-    <img id="company-logo" src="https://cdn-icons-png.flaticon.com/512/4712/4712109.png" alt="Logo">
+    <img id="company-logo" src="https://png.pngtree.com/png-clipart/20241011/original/pngtree-rainbow-dog-clipart-illustration---perfect-for-your-project-png-image_16270920.png" alt="Logo">
 
     <div id="info-form">
-        <h2 style="color: #2c3e50;">Khám Phá Bản Thân AI</h2>
-        <p style="font-size: 0.9em; color: #666; margin-bottom: 20px;">Dành 2 phút để hiểu rõ tính cách và nghề nghiệp phù hợp</p>
+        <h2>Khám Phá Bản Thân AI</h2>
+        <p style="font-size: 0.9em; color: #666; margin-bottom: 20px;">Dành 2 phút để tìm ra nghề nghiệp phù hợp nhất với bạn.</p>
         
         <div class="form-group">
             <label>Họ và Tên</label>
@@ -112,123 +194,136 @@
             </div>
         </div>
         <div class="form-group">
-            <label>Email (Để nhận kết quả chi tiết)</label>
+            <label>Email (Nhận kết quả chi tiết)</label>
             <input type="email" id="user-email" placeholder="email@example.com">
         </div>
-        <button class="btn-primary" onclick="startApp()">BẮT ĐẦU KHÁM PHÁ</button>
+        <button class="btn-primary" onclick="startApp()">BẮT ĐẦU NGAY ➔</button>
     </div>
 
-    <div id="quiz-screen" style="display:none;">
-        <p style="color:#888; font-size: 0.9em; margin-bottom: 5px;">Chạm vào hình để xem mô tả chi tiết</p>
-        <div id="card-container">
+    <div id="quiz-screen">
+        <div style="font-size: 0.8em; color: #999; margin-bottom: 5px;">Chạm vào thẻ để xem chi tiết</div>
+        
+        <div id="card-container"></div>
+        
+        <div class="choice-buttons">
+            <div class="btn-wrapper">
+                <button class="btn-circle btn-no" onclick="triggerSwipe('left')">✖</button>
+                <span class="btn-label">Không thích</span>
             </div>
-        <div class="choice-buttons" id="choice-btns">
-            <button class="btn-choice btn-no" onclick="handleChoice(false)">✖ Không</button>
-            <button class="btn-choice btn-yes" onclick="handleChoice(true)">✔ Có</button>
+            <div class="btn-wrapper">
+                <button class="btn-circle btn-yes" onclick="triggerSwipe('right')">❤</button>
+                <span class="btn-label">Thích</span>
+            </div>
         </div>
     </div>
 
     <div id="result-section">
-        <h2 style="color: #28a745;">Kết quả Phân tích</h2>
+        <h2 style="color: #28a745;">🎉 Hoàn thành!</h2>
         <div class="result-box">
             <p><strong>Họ tên:</strong> <span id="res-name"></span></p>
-            <p><strong>Thông tin:</strong> <span id="res-info"></span></p>
             <p><strong>Email:</strong> <span id="res-email"></span></p>
         </div>
 
         <div id="ai-analysis">
             <div class="ai-loading">
-                <div class="spinner" style="margin: 0 auto;"></div>
-                <br>🤖 AI đang tổng hợp dữ liệu và viết báo cáo cho bạn...<br>(Quá trình này mất khoảng 5-10 giây)
+                <div class="spinner"></div>
+                🤖 AI đang phân tích hồ sơ và viết báo cáo riêng cho bạn...<br>(Vui lòng đợi khoảng 5-10 giây)
             </div>
-        </div>
-
-        <button class="toggle-btn" onclick="toggleDetails()">KẾT QUẢ PHÂN LOẠI CỦA BẠN ▼</button>
-        <div id="classification-details" class="hidden-content">
-            <p style="font-weight:bold; margin-bottom:5px;">Các hoạt động bạn yêu thích:</p>
-            <ul id="selected-cards-list" style="padding-left: 20px; color: #555;"></ul>
         </div>
 
         <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
         <button id="btn-send-email" class="btn-primary" style="background:#6f42c1" onclick="sendEmailReport()">
-            📧 NHẬN KẾT QUẢ PHÂN TÍCH QUA EMAIL
+            📧 GỬI KẾT QUẢ VỀ EMAIL
         </button>
-        <span class="email-note">* Kết quả này sẽ biến mất sau khi tải lại trang</span>
     </div>
 </div>
 
 <script>
-// --- CẤU HÌNH LIÊN KẾT ---
+/* ============================================================
+   CẤU HÌNH HỆ THỐNG (BẠN CẦN SỬA PHẦN NÀY)
+   ============================================================ */
 const CONFIG = {
-    // Key Gemini AI
-    AI_KEY: "AIzaSyBvbJ9HBeJSqrWDI0HNWfvJZ29huFD5b9c",
+    // 1. API KEY của Google Gemini
+    AI_KEY: "AIzaSyBvbJ9HBeJSqrWDI0HNWfvJZ29huFD5b9c", 
     
-    // Link Google Sheet xuất bản dưới dạng CSV (Sheet chứa câu hỏi)
-    SHEET_CSV: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTn_AISCPAvNtkZZcjcMn4_80wXuarbci9SyqBqDnnHpB5WM1QShft3xU7HHxgIP_AKz9ffyoEsAd9D/pub?output=csv",
+    // 2. Link CSV từ Google Sheet (Nhớ Publish to Web -> chọn CSV)
+    // Cấu trúc Sheet bắt buộc 10 cột: 
+    // ID | TênVN | TênEN | Group | Ảnh1 | Ảnh2 | Mô tả | MônHọc | PhẩmChất | Fact
+    SHEET_CSV: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTn_AISCPAvNtkZZcjcMn4_80wXuarbci9SyqBqDnnHpB5WM1QShft3xU7HHxgIP_AKz9ffyoEsAd9D/pub?output=csv", 
     
-    // Link Google Apps Script Web App (Để gửi Email)
-    SCRIPT_URL: "https://script.google.com/macros/s/AKfycbyz4BHfAQ-PDpCZDeiWLY5-i_eMzDbSTVy9NZdJs5Dge9-AbaBKeiNBCYjeRBIp-8izww/exec"
+    // 3. Link Google Apps Script (Tùy chọn, để gửi mail)
+    SCRIPT_URL: "https://script.google.com/macros/s/AKfycbyliagMSTi8XV2z7wR2hCD2gm_25sXqftbw-J26gOE85bHflVyjAyShSiE2xywBjdqJ-A/exec"
 };
 
-// --- BIẾN TOÀN CỤC ---
+/* ============================================================
+   LOGIC ỨNG DỤNG
+   ============================================================ */
 let userProfile = { name: "", yob: 0, gender: "", email: "", scores: {}, selectedCards: [], aiResultText: "" };
-let rawData = []; // Dữ liệu gốc
-let quizData = []; // Dữ liệu sau khi random
+let rawData = []; 
+let quizData = []; 
 let currentCardIndex = 0;
 
-// --- PHẦN 1: TẢI DỮ LIỆU TỪ GOOGLE SHEET ---
+// --- 1. TẢI DỮ LIỆU ---
 async function initData() {
     try {
         const response = await fetch(CONFIG.SHEET_CSV);
+        if (!response.ok) throw new Error("Không thể tải CSV");
         const text = await response.text();
         rawData = parseCSV(text);
         
-        console.log("Đã tải được:", rawData.length, "dòng dữ liệu");
+        console.log("Đã tải:", rawData.length, "nghề");
         document.getElementById('loading-overlay').style.display = 'none';
-        
     } catch (error) {
-        alert("Lỗi tải dữ liệu! Vui lòng kiểm tra kết nối mạng.");
+        alert("Lỗi tải dữ liệu. Vui lòng kiểm tra đường link CSV.");
         console.error(error);
+        document.getElementById('loading-overlay').innerHTML = "<p style='color:red'>Lỗi kết nối máy chủ!</p>";
     }
 }
 
-// Hàm chuyển đổi CSV sang JSON (Cần map đúng cột trong Sheet của bạn)
 function parseCSV(csvText) {
     const lines = csvText.trim().split('\n');
-    const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, '')); // Lấy header
-    
     const result = [];
+    
+    // Map icon nhóm nghề
+    const groupIcons = {
+        'R': 'https://cdn-icons-png.flaticon.com/512/3096/3096677.png',
+        'I': 'https://cdn-icons-png.flaticon.com/512/2103/2103633.png',
+        'A': 'https://cdn-icons-png.flaticon.com/512/2983/2983067.png',
+        'S': 'https://cdn-icons-png.flaticon.com/512/3209/3209265.png',
+        'E': 'https://cdn-icons-png.flaticon.com/512/2037/2037710.png',
+        'C': 'https://cdn-icons-png.flaticon.com/512/2666/2666505.png'
+    };
+
+    // Bỏ qua dòng tiêu đề (i=1)
     for(let i = 1; i < lines.length; i++) {
-        // Tách dấu phẩy nhưng bỏ qua dấu phẩy trong ngoặc kép (Regex đơn giản)
-        // Lưu ý: Nếu dữ liệu đơn giản không có dấu phẩy trong nội dung thì dùng .split(',') là đủ
-        const row = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/); 
-        
-        if(row.length < 2) continue; // Bỏ qua dòng trống
+        // Regex xử lý dấu phẩy trong ngoặc kép
+        const row = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+        if(row.length < 2) continue;
 
-        // Map dữ liệu vào object. 
-        // GIẢ ĐỊNH THỨ TỰ CỘT TRONG SHEET LÀ: [ID, Nội Dung, Nhóm, Ảnh Bé, Ảnh Lớn, Mô tả]
-        // Nếu Sheet bạn khác, hãy sửa chỉ số index [0], [1]... ở dưới
-        const cleanCell = (txt) => txt ? txt.replace(/^"|"$/g, '').trim() : "";
+        const clean = (t) => t ? t.replace(/^"|"$/g, '').trim() : "Đang cập nhật";
 
-        // Tự động map nếu header có tên giống (hoặc map thủ công theo thứ tự cột)
-        // Ở đây tôi map theo thứ tự cột phổ biến để an toàn:
+        // Map đúng 10 cột dữ liệu mới
         let obj = {
-            id: cleanCell(row[0]),
-            name: cleanCell(row[1]),     // Cột B: Tên nghề/Hoạt động
-            group: cleanCell(row[2]),    // Cột C: Nhóm RIASEC (R, I, A...)
-            img1: cleanCell(row[3]),     // Cột D: Link ảnh 10-14 tuổi
-            img2: cleanCell(row[4]),     // Cột E: Link ảnh 15+ tuổi
-            desc: cleanCell(row[5]) || "Mô tả đang cập nhật..." // Cột F: Mô tả
+            id: clean(row[0]),
+            nameVN: clean(row[1]),
+            nameEN: clean(row[2]),
+            group: clean(row[3]),
+            img1: clean(row[4]),
+            img2: clean(row[5]),
+            desc: clean(row[6]),
+            subjects: clean(row[7]),
+            qualities: clean(row[8]),
+            fact: clean(row[9]),
+            groupIcon: groupIcons[clean(row[3]).charAt(0).toUpperCase()] || "" 
         };
         result.push(obj);
     }
     return result;
 }
 
-// Gọi hàm tải dữ liệu ngay khi chạy
 initData();
 
-// --- PHẦN 2: LOGIC APP ---
+// --- 2. XỬ LÝ FORM & BẮT ĐẦU ---
 function selectGender(gender, btn) {
     userProfile.gender = gender;
     document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('active'));
@@ -236,59 +331,52 @@ function selectGender(gender, btn) {
 }
 
 function startApp() {
-    // Validate Input
     userProfile.name = document.getElementById('user-name').value.trim();
     userProfile.yob = parseInt(document.getElementById('user-yob').value);
     userProfile.email = document.getElementById('user-email').value.trim();
 
     if (!userProfile.name || !userProfile.yob || !userProfile.email || !userProfile.gender) {
-        alert("Vui lòng nhập đầy đủ thông tin để bắt đầu!");
+        alert("Vui lòng nhập đầy đủ thông tin!");
         return;
     }
-
     if (rawData.length === 0) {
-        alert("Dữ liệu chưa tải xong. Vui lòng đợi 3 giây và thử lại.");
+        alert("Dữ liệu chưa sẵn sàng. Vui lòng đợi thêm vài giây.");
         return;
     }
 
-    // Tính tuổi
+    // Tính tuổi & Lọc ảnh
     const currentYear = new Date().getFullYear();
     userProfile.age = currentYear - userProfile.yob;
     const isGroup1 = (userProfile.age >= 10 && userProfile.age <= 14);
 
-    // CHUẨN BỊ BỘ CÂU HỎI (Random 30 câu cân bằng)
-    quizData = generateBalancedQuiz(30).map(item => ({
+    // Random 20 câu hỏi cân bằng
+    quizData = generateQuiz(20).map(item => ({
         ...item,
-        // Chọn ảnh phù hợp tuổi, nếu không có lấy ảnh placeholder
-        displayImg: (isGroup1 ? item.img1 : item.img2) || "https://via.placeholder.com/400x300?text=No+Image"
+        displayImg: (isGroup1 ? item.img1 : item.img2) || "https://via.placeholder.com/400x600?text=No+Image"
     }));
 
-    // Chuyển giao diện
+    // Chuyển màn hình
     document.getElementById('info-form').style.display = 'none';
-    document.getElementById('quiz-screen').style.display = 'block';
-    document.getElementById('choice-btns').style.display = 'flex';
-    
+    document.getElementById('quiz-screen').style.display = 'flex';
     renderCard(0);
 }
 
-function generateBalancedQuiz(totalCount) {
-    const countPerGroup = Math.floor(totalCount / 6); 
+function generateQuiz(count) {
+    // Logic: Lấy đều các nhóm
     let selected = [];
     const groups = ['R', 'I', 'A', 'S', 'E', 'C'];
-    
     groups.forEach(g => {
-        let groupItems = rawData.filter(x => x.group && x.group.toUpperCase() === g);
-        // Shuffle
-        groupItems.sort(() => 0.5 - Math.random());
-        // Lấy 5 thẻ
-        selected = selected.concat(groupItems.slice(0, countPerGroup));
+        let items = rawData.filter(x => x.group.startsWith(g)).sort(() => 0.5 - Math.random());
+        selected = selected.concat(items.slice(0, 4)); // Lấy 4 thẻ mỗi nhóm
     });
-    
-    // Shuffle lần cuối
-    return selected.sort(() => 0.5 - Math.random());
+    return selected.sort(() => 0.5 - Math.random()).slice(0, count);
 }
 
-// --- PHẦN 3: HIỂN THỊ & TƯƠNG TÁC ---
+// --- 3. RENDER THẺ & LOGIC VUỐT (SWIPE) ---
+let currentCardEl = null;
+let isDragging = false;
+let startX = 0;
+
 function renderCard(index) {
     if (index >= quizData.length) {
         finishQuiz();
@@ -297,76 +385,158 @@ function renderCard(index) {
 
     const data = quizData[index];
     const container = document.getElementById('card-container');
-    
-    container.innerHTML = `
-        <div class="card-wrapper deal-animation" onclick="this.classList.toggle('is-flipped')">
+    container.innerHTML = ''; 
+
+    // HTML THẺ BÀI
+    const cardHTML = `
+        <div class="card-wrapper" id="current-card">
             <div class="card-face front">
-                <div class="card-image-wrapper">
-                    <img src="${data.displayImg}" alt="Job Image" onerror="this.src='https://via.placeholder.com/400?text=Ảnh+Lỗi'">
+                <img src="${data.displayImg}" draggable="false">
+                <div class="text-overlay">
+                    <h2 class="job-vn">${data.nameVN}</h2>
+                    <p class="job-en">${data.nameEN}</p>
+                    <div class="tap-hint">👆 Chạm để lật xem chi tiết</div>
                 </div>
-                <h3>${data.name}</h3>
-                <p style="font-size:0.8em; color:#999; margin-top: auto;">(Chạm vào thẻ để lật)</p>
             </div>
+
             <div class="card-face back">
-                <h3 style="color:#333">Thông tin nghề</h3>
-                <p style="text-align:justify; padding:0 10px;">${data.desc}</p>
-                <div style="margin-top:auto; font-weight:bold; color:#007bff; border:1px solid #007bff; padding:5px 15px; border-radius:20px;">
-                    Nhóm: ${data.group}
+                <div class="back-header">
+                    <img src="${data.groupIcon}" style="width: 40px; height: 40px;">
+                    <div>
+                        <h3 style="margin:0; font-size:1.1em">${data.nameVN}</h3>
+                        <span style="background:#eee; padding:2px 8px; border-radius:4px; font-size:0.7em; font-weight:bold; color:#555">Nhóm RIASEC: ${data.group}</span>
+                    </div>
+                </div>
+                <div class="back-content">
+                    <span class="section-title">📖 Mô tả công việc</span>
+                    <div>${data.desc}</div>
+
+                    <span class="section-title">📚 Môn học cần giỏi</span>
+                    <div>${data.subjects}</div>
+
+                    <span class="section-title">💎 Phẩm chất & Kỹ năng</span>
+                    <div>${data.qualities}</div>
+
+                    <div class="fun-fact">💡 <b>Có thể bạn chưa biết:</b> ${data.fact}</div>
                 </div>
             </div>
         </div>
     `;
-}
-
-function handleChoice(isLike) {
-    const currentItem = quizData[currentCardIndex];
-    if (isLike) {
-        const g = currentItem.group.toUpperCase();
-        userProfile.scores[g] = (userProfile.scores[g] || 0) + 1;
-        userProfile.selectedCards.push(`${currentItem.name} (${g})`);
-    }
     
-    currentCardIndex++;
-    // Delay nhỏ để tạo cảm giác mượt
-    setTimeout(() => renderCard(currentCardIndex), 200);
+    container.innerHTML = cardHTML;
+    currentCardEl = document.getElementById('current-card');
+
+    // Sự kiện Click để lật (Nếu không vuốt)
+    currentCardEl.addEventListener('click', (e) => {
+        // Chỉ lật nếu chuột di chuyển rất ít (click, không phải drag)
+        if(!isDragging && Math.abs(startX - (e.clientX || e.changedTouches[0].clientX)) < 5) {
+            currentCardEl.classList.toggle('is-flipped');
+        }
+    });
+
+    initSwipe(currentCardEl);
 }
 
-// --- PHẦN 4: KẾT QUẢ & AI & GỬI EMAIL ---
+// --- LOGIC VUỐT CHI TIẾT ---
+function initSwipe(card) {
+    card.addEventListener('touchstart', dragStart);
+    card.addEventListener('touchmove', dragMove);
+    card.addEventListener('touchend', dragEnd);
+    
+    card.addEventListener('mousedown', dragStart);
+    document.addEventListener('mousemove', dragMove);
+    document.addEventListener('mouseup', dragEnd);
+}
+
+function dragStart(e) {
+    isDragging = true;
+    startX = (e.type === 'touchstart') ? e.touches[0].clientX : e.clientX;
+    currentCardEl.style.transition = 'none'; 
+}
+
+function dragMove(e) {
+    if (!isDragging || !currentCardEl) return;
+    
+    // Ngăn chặn hành động mặc định (scroll)
+    // e.preventDefault(); 
+    
+    const currentX = (e.type === 'touchmove') ? e.touches[0].clientX : e.clientX;
+    const deltaX = currentX - startX;
+    const rotate = deltaX * 0.05;
+
+    currentCardEl.style.transform = `translateX(${deltaX}px) rotate(${rotate}deg)`;
+    
+    // Đổi màu box-shadow gợi ý
+    if (deltaX > 20) currentCardEl.style.boxShadow = "0 0 20px rgba(46, 213, 115, 0.6)"; // Xanh
+    else if (deltaX < -20) currentCardEl.style.boxShadow = "0 0 20px rgba(255, 71, 87, 0.6)"; // Đỏ
+    else currentCardEl.style.boxShadow = "";
+}
+
+function dragEnd(e) {
+    if (!isDragging || !currentCardEl) return;
+    isDragging = false;
+    currentCardEl.style.transition = 'transform 0.4s ease-out';
+    currentCardEl.style.boxShadow = "";
+
+    const matrix = new WebKitCSSMatrix(getComputedStyle(currentCardEl).transform);
+    const currentX = matrix.m41; 
+    const threshold = 100;
+
+    if (currentX > threshold) triggerSwipe('right');
+    else if (currentX < -threshold) triggerSwipe('left');
+    else currentCardEl.style.transform = `translateX(0) rotate(0)`;
+}
+
+// Xử lý kết quả Thích/Không thích
+function triggerSwipe(direction) {
+    if(!currentCardEl) return;
+    
+    const item = quizData[currentCardIndex];
+    if (direction === 'right') {
+        currentCardEl.classList.add('fly-right');
+        // Ghi điểm
+        const g = item.group.charAt(0).toUpperCase();
+        userProfile.scores[g] = (userProfile.scores[g] || 0) + 1;
+        userProfile.selectedCards.push(item.nameVN);
+    } else {
+        currentCardEl.classList.add('fly-left');
+    }
+
+    setTimeout(() => {
+        currentCardIndex++;
+        renderCard(currentCardIndex);
+    }, 300);
+}
+
+// --- 4. KẾT THÚC & GỌI AI ---
 function finishQuiz() {
     document.getElementById('quiz-screen').style.display = 'none';
     document.getElementById('result-section').style.display = 'block';
 
-    // Điền thông tin
     document.getElementById('res-name').innerText = userProfile.name;
-    document.getElementById('res-info').innerText = `${userProfile.age} tuổi - ${userProfile.gender}`;
     document.getElementById('res-email').innerText = userProfile.email;
 
-    // List các thẻ đã chọn
-    const listHtml = userProfile.selectedCards.map(item => `<li>${item}</li>`).join('');
-    document.getElementById('selected-cards-list').innerHTML = listHtml || "<li>Bạn không chọn hoạt động nào cụ thể.</li>";
-
-    // Gọi AI phân tích
     callGeminiAnalysis();
 }
 
 async function callGeminiAnalysis() {
-    // Lấy top 3 nhóm điểm cao
+    // Tìm nhóm điểm cao nhất
     const sortedScores = Object.entries(userProfile.scores).sort((a, b) => b[1] - a[1]);
     const topGroups = sortedScores.slice(0, 3).map(x => x[0]).join(", ");
     
-    // Prompt cho AI
+    // Prompt (Đã fix lỗi SyntaxError)
     const prompt = `
-        Bạn là chuyên gia tư vấn hướng nghiệp. Hãy phân tích cho người dùng:
-        - Tên: ${userProfile.name}, ${userProfile.age} tuổi, giới tính ${userProfile.gender}.
-        - Kết quả trắc nghiệm Holland (RIASEC) nổi trội ở các nhóm: ${topGroups || "Chưa rõ rệt"}.
+        Đóng vai chuyên gia hướng nghiệp. Hãy viết báo cáo cho học sinh:
+        - Tên: ${userProfile.name}, ${userProfile.age} tuổi.
+        - Nhóm Holland nổi trội: ${topGroups || "Không rõ rệt"}.
+        - Các nghề đã chọn thích: ${userProfile.selectedCards.join(", ") || "Không chọn nghề nào"}.
+
+        Hãy viết báo cáo ngắn (HTML cơ bản, không dùng markdown code block) gồm:
+        1. <b>Điểm mạnh tính cách:</b> Dựa trên nhóm ${topGroups}.
+        2. <b>Gợi ý nghề nghiệp:</b> Đề xuất 3 nghề cụ thể phù hợp nhất.
+        3. <b>Lời khuyên:</b> Ngắn gọn để phát triển bản thân.
         
-        Hãy viết một báo cáo ngắn (định dạng HTML cơ bản, tuyệt đối không bọc trong thẻ code block) gồm:
-        1. <b>Tính cách nổi bật:</b> Nhận xét dựa trên nhóm ${topGroups}.
-        2. <b>Môi trường làm việc phù hợp:</b> Mô tả không gian làm việc.
-        3. <b>Top 5 nghề nghiệp gợi ý:</b> Liệt kê cụ thể.
-        4. <b>Lời khuyên phát triển:</b> Ngắn gọn.
-        
-        Giọng văn tích cực, khuyến khích, dễ hiểu với lứa tuổi ${userProfile.age}.
+        Giọng văn: Thân thiện, khích lệ.
     `;
 
     try {
@@ -380,62 +550,38 @@ async function callGeminiAnalysis() {
         const data = await response.json();
         const aiText = data.candidates[0].content.parts[0].text;
         
-        // Lưu kết quả để gửi mail
         userProfile.aiResultText = aiText;
-        
-        // Hiển thị ra màn hình
         document.getElementById('ai-analysis').innerHTML = aiText;
         
     } catch (error) {
-        console.error("Lỗi AI:", error);
-        document.getElementById('ai-analysis').innerHTML = "<p style='color:red'>Hệ thống AI đang bận. Bạn vẫn có thể nhận kết quả qua Email.</p>";
-        userProfile.aiResultText = "Hệ thống AI không phản hồi lúc này. Tuy nhiên dựa trên điểm số, bạn thuộc nhóm nổi bật: " + topGroups;
+        console.error(error);
+        document.getElementById('ai-analysis').innerHTML = "<p style='color:red'>Hệ thống AI đang bận. Bạn hãy bấm gửi Email để nhận kết quả sau.</p>";
     }
 }
 
-// --- PHẦN 5: GỬI EMAIL (Kết nối Apps Script) ---
 function sendEmailReport() {
+    // Hàm này kết nối tới Google Apps Script để gửi mail
     const btn = document.getElementById('btn-send-email');
-    btn.innerText = "⏳ Đang gửi dữ liệu...";
+    btn.innerText = "⏳ Đang gửi...";
     btn.disabled = true;
 
-    // Chuẩn bị dữ liệu gửi đi (Mapping với Google Apps Script của bạn)
-    // Script của bạn cần nhận các tham số này trong hàm doPost(e)
     const formData = new FormData();
     formData.append('name', userProfile.name);
     formData.append('email', userProfile.email);
-    formData.append('age', userProfile.age);
-    formData.append('gender', userProfile.gender);
-    formData.append('top_groups', userProfile.selectedCards.join(", ")); // Hoặc gửi điểm số
-    formData.append('ai_analysis', userProfile.aiResultText); // Nội dung AI viết
-    
-    // Gửi request tới Google Apps Script
-    fetch(CONFIG.SCRIPT_URL, {
-        method: 'POST',
-        body: formData,
-        mode: 'no-cors' // Quan trọng: no-cors để tránh lỗi chặn từ trình duyệt khi gọi Google Script
-    })
+    formData.append('ai_analysis', userProfile.aiResultText);
+
+    fetch(CONFIG.SCRIPT_URL, { method: 'POST', body: formData, mode: 'no-cors' })
     .then(() => {
-        // Vì no-cors không trả về status chuẩn, ta giả định thành công nếu request đi được
-        alert(`✅ Đã gửi thành công!\nVui lòng kiểm tra hộp thư (cả mục Spam) của email: ${userProfile.email}`);
+        alert(`✅ Đã gửi kết quả tới ${userProfile.email}`);
         btn.innerText = "✔ Đã gửi xong";
     })
-    .catch(error => {
-        console.error('Lỗi gửi mail:', error);
-        alert("Có lỗi khi gửi email. Vui lòng thử lại!");
+    .catch(() => {
+        alert("Lỗi gửi mail.");
         btn.innerText = "Gửi lại";
         btn.disabled = false;
     });
 }
-
-// Tiện ích
-function toggleDetails() {
-    const el = document.getElementById('classification-details');
-    el.style.display = (el.style.display === 'none' || el.style.display === '') ? 'block' : 'none';
-}
 </script>
 
 </body>
-
 </html>
-
