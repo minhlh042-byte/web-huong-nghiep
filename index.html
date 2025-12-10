@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trắc nghiệm Định hướng Nghề nghiệp AI</title>
+    <style>
+        /* --- CSS CHUNG --- */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; text-align: center; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        
+        /* --- HIỆU ỨNG LOGO --- */
+        #company-logo { 
+            max-width: 150px; display: none; margin: 0 auto 20px; 
+            animation: logoBounceIn 1.2s cubic-bezier(0.68, -0.55, 0.27, 1.55) both;
+        }
+        @keyframes logoBounceIn {
+            0% { opacity: 0; transform: scale(0.3) translateY(-100px); }
+            50% { opacity: 1; transform: scale(1.1); }
+            100% { transform: scale(1); translateY(0); }
+        }
+
+        /* --- INPUT FORM --- */
+        .form-group { margin-bottom: 15px; text-align: left; }
+        label { font-weight: bold; display: block; margin-bottom: 5px; }
+        input[type="text"], input[type="number"], input[type="email"] { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 14px; }
+        .gender-options { display: flex; gap: 10px; }
+        .gender-btn { flex: 1; padding: 10px; border: 1px solid #ddd; background: #f9f9f9; cursor: pointer; border-radius: 8px; transition: 0.2s; }
+        .gender-btn.active { background: #007bff; color: white; border-color: #007bff; font-weight: bold; }
+        
+        .btn-primary { width: 100%; padding: 14px; background: #28a745; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; margin-top: 10px; transition: 0.3s; font-weight: bold; }
+        .btn-primary:hover { background: #218838; transform: translateY(-2px); }
+        .btn-primary:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+
+        /* --- CARD & FLIP EFFECT --- */
+        #card-container { perspective: 1000px; height: 450px; position: relative; margin-top: 20px; display: none; }
+        .card-wrapper {
+            width: 100%; height: 100%; position: absolute;
+            transform-style: preserve-3d; transition: transform 0.6s; cursor: pointer;
+        }
+        .card-wrapper.is-flipped { transform: rotateY(180deg); }
+        
+        .card-face {
+            position: absolute; width: 100%; height: 100%;
+            backface-visibility: hidden; border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+            background: white; padding: 20px; box-sizing: border-box; overflow: hidden;
+        }
+        .card-face.back { transform: rotateY(180deg); background: #f8f9fa; color: #333; justify-content: center; }
+        
+        /* Chỉnh ảnh hiển thị gọn đẹp */
+        .card-image-wrapper { width: 100%; height: 280px; overflow: hidden; border-radius: 10px; margin-bottom: 15px; }
+        .card-face img { width: 100%; height: 100%; object-fit: cover; }
+        .card-face h3 { margin: 10px 0 5px; font-size: 1.2em; color: #007bff; }
+
+        /* Animation chia bài */
+        .deal-animation { animation: dealCard 0.5s ease-out forwards; }
+        @keyframes dealCard { from { opacity: 0; transform: translateY(-50px) scale(0.8); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+        /* Nút chọn */
+        .choice-buttons { margin-top: 20px; display: none; justify-content: center; gap: 30px; }
+        .btn-choice { width: 130px; padding: 12px; border-radius: 30px; border: none; cursor: pointer; font-weight: bold; font-size: 16px; transition: transform 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .btn-yes { background: #4caf50; color: white; }
+        .btn-no { background: #f44336; color: white; }
+        .btn-choice:active { transform: scale(0.95); }
+
+        /* --- KẾT QUẢ --- */
+        #result-section { display: none; text-align: left; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        .ai-loading { text-align: center; color: #666; font-style: italic; padding: 20px; background: #f8f9fa; border-radius: 10px; }
+        .result-box { background: #e9ecef; padding: 15px; border-radius: 10px; margin-bottom: 15px; font-size: 0.95em; }
+        .toggle-btn { background: #17a2b8; color: white; padding: 10px; border: none; width: 100%; border-radius: 5px; cursor: pointer; margin-top: 10px; font-weight: bold; }
+        .hidden-content { display: none; margin-top: 10px; padding: 15px; border: 1px dashed #ccc; background: #fff; border-radius: 5px; }
+        
+        .email-note { font-size: 0.8em; color: #d9534f; margin-top: 8px; font-style: italic; text-align: center; display: block;}
+        
+        /* Loading overlay khi tải dữ liệu */
+        #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; display: flex; justify-content: center; align-items: center; flex-direction: column; }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 10px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<div id="loading-overlay">
+    <div class="spinner"></div>
+    <p>Đang tải dữ liệu từ máy chủ...</p>
+</div>
+
+<div class="container">
+    <img id="company-logo" src="https://cdn-icons-png.flaticon.com/512/4712/4712109.png" alt="Logo">
+
+    <div id="info-form">
+        <h2 style="color: #2c3e50;">Khám Phá Bản Thân AI</h2>
+        <p style="font-size: 0.9em; color: #666; margin-bottom: 20px;">Dành 2 phút để hiểu rõ tính cách và nghề nghiệp phù hợp</p>
+        
+        <div class="form-group">
+            <label>Họ và Tên</label>
+            <input type="text" id="user-name" placeholder="Ví dụ: Nguyễn Văn A">
+        </div>
+        <div class="form-group">
+            <label>Năm sinh</label>
+            <input type="number" id="user-yob" placeholder="Ví dụ: 2005">
+        </div>
+        <div class="form-group">
+            <label>Giới tính</label>
+            <div class="gender-options">
+                <div class="gender-btn" onclick="selectGender('Nam', this)">Nam</div>
+                <div class="gender-btn" onclick="selectGender('Nữ', this)">Nữ</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Email (Để nhận kết quả chi tiết)</label>
+            <input type="email" id="user-email" placeholder="email@example.com">
+        </div>
+        <button class="btn-primary" onclick="startApp()">BẮT ĐẦU KHÁM PHÁ</button>
+    </div>
+
+    <div id="quiz-screen" style="display:none;">
+        <p style="color:#888; font-size: 0.9em; margin-bottom: 5px;">Chạm vào hình để xem mô tả chi tiết</p>
+        <div id="card-container">
+            </div>
+        <div class="choice-buttons" id="choice-btns">
+            <button class="btn-choice btn-no" onclick="handleChoice(false)">✖ Không</button>
+            <button class="btn-choice btn-yes" onclick="handleChoice(true)">✔ Có</button>
+        </div>
+    </div>
+
+    <div id="result-section">
+        <h2 style="color: #28a745;">Kết quả Phân tích</h2>
+        <div class="result-box">
+            <p><strong>Họ tên:</strong> <span id="res-name"></span></p>
+            <p><strong>Thông tin:</strong> <span id="res-info"></span></p>
+            <p><strong>Email:</strong> <span id="res-email"></span></p>
+        </div>
+
+        <div id="ai-analysis">
+            <div class="ai-loading">
+                <div class="spinner" style="margin: 0 auto;"></div>
+                <br>🤖 AI đang tổng hợp dữ liệu và viết báo cáo cho bạn...<br>(Quá trình này mất khoảng 5-10 giây)
+            </div>
+        </div>
+
+        <button class="toggle-btn" onclick="toggleDetails()">KẾT QUẢ PHÂN LOẠI CỦA BẠN ▼</button>
+        <div id="classification-details" class="hidden-content">
+            <p style="font-weight:bold; margin-bottom:5px;">Các hoạt động bạn yêu thích:</p>
+            <ul id="selected-cards-list" style="padding-left: 20px; color: #555;"></ul>
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+        <button id="btn-send-email" class="btn-primary" style="background:#6f42c1" onclick="sendEmailReport()">
+            📧 NHẬN KẾT QUẢ PHÂN TÍCH QUA EMAIL
+        </button>
+        <span class="email-note">* Kết quả này sẽ biến mất sau khi tải lại trang</span>
+    </div>
+</div>
+
+<script>
+// --- CẤU HÌNH LIÊN KẾT ---
+const CONFIG = {
+    // Key Gemini AI
+    AI_KEY: "AIzaSyBvbJ9HBeJSqrWDI0HNWfvJZ29huFD5b9c",
+    
+    // Link Google Sheet xuất bản dưới dạng CSV (Sheet chứa câu hỏi)
+    SHEET_CSV: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTn_AISCPAvNtkZZcjcMn4_80wXuarbci9SyqBqDnnHpB5WM1QShft3xU7HHxgIP_AKz9ffyoEsAd9D/pub?output=csv",
+    
+    // Link Google Apps Script Web App (Để gửi Email)
+    SCRIPT_URL: "https://script.google.com/macros/s/AKfycbyz4BHfAQ-PDpCZDeiWLY5-i_eMzDbSTVy9NZdJs5Dge9-AbaBKeiNBCYjeRBIp-8izww/exec"
+};
+
+// --- BIẾN TOÀN CỤC ---
+let userProfile = { name: "", yob: 0, gender: "", email: "", scores: {}, selectedCards: [], aiResultText: "" };
+let rawData = []; // Dữ liệu gốc
+let quizData = []; // Dữ liệu sau khi random
+let currentCardIndex = 0;
+
+// --- PHẦN 1: TẢI DỮ LIỆU TỪ GOOGLE SHEET ---
+async function initData() {
+    try {
+        const response = await fetch(CONFIG.SHEET_CSV);
+        const text = await response.text();
+        rawData = parseCSV(text);
+        
+        console.log("Đã tải được:", rawData.length, "dòng dữ liệu");
+        document.getElementById('loading-overlay').style.display = 'none';
+        
+    } catch (error) {
+        alert("Lỗi tải dữ liệu! Vui lòng kiểm tra kết nối mạng.");
+        console.error(error);
+    }
+}
+
+// Hàm chuyển đổi CSV sang JSON (Cần map đúng cột trong Sheet của bạn)
+function parseCSV(csvText) {
+    const lines = csvText.trim().split('\n');
+    const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, '')); // Lấy header
+    
+    const result = [];
+    for(let i = 1; i < lines.length; i++) {
+        // Tách dấu phẩy nhưng bỏ qua dấu phẩy trong ngoặc kép (Regex đơn giản)
+        // Lưu ý: Nếu dữ liệu đơn giản không có dấu phẩy trong nội dung thì dùng .split(',') là đủ
+        const row = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/); 
+        
+        if(row.length < 2) continue; // Bỏ qua dòng trống
+
+        // Map dữ liệu vào object. 
+        // GIẢ ĐỊNH THỨ TỰ CỘT TRONG SHEET LÀ: [ID, Nội Dung, Nhóm, Ảnh Bé, Ảnh Lớn, Mô tả]
+        // Nếu Sheet bạn khác, hãy sửa chỉ số index [0], [1]... ở dưới
+        const cleanCell = (txt) => txt ? txt.replace(/^"|"$/g, '').trim() : "";
+
+        // Tự động map nếu header có tên giống (hoặc map thủ công theo thứ tự cột)
+        // Ở đây tôi map theo thứ tự cột phổ biến để an toàn:
+        let obj = {
+            id: cleanCell(row[0]),
+            name: cleanCell(row[1]),     // Cột B: Tên nghề/Hoạt động
+            group: cleanCell(row[2]),    // Cột C: Nhóm RIASEC (R, I, A...)
+            img1: cleanCell(row[3]),     // Cột D: Link ảnh 10-14 tuổi
+            img2: cleanCell(row[4]),     // Cột E: Link ảnh 15+ tuổi
+            desc: cleanCell(row[5]) || "Mô tả đang cập nhật..." // Cột F: Mô tả
+        };
+        result.push(obj);
+    }
+    return result;
+}
+
+// Gọi hàm tải dữ liệu ngay khi chạy
+initData();
+
+// --- PHẦN 2: LOGIC APP ---
+function selectGender(gender, btn) {
+    userProfile.gender = gender;
+    document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+}
+
+function startApp() {
+    // Validate Input
+    userProfile.name = document.getElementById('user-name').value.trim();
+    userProfile.yob = parseInt(document.getElementById('user-yob').value);
+    userProfile.email = document.getElementById('user-email').value.trim();
+
+    if (!userProfile.name || !userProfile.yob || !userProfile.email || !userProfile.gender) {
+        alert("Vui lòng nhập đầy đủ thông tin để bắt đầu!");
+        return;
+    }
+
+    if (rawData.length === 0) {
+        alert("Dữ liệu chưa tải xong. Vui lòng đợi 3 giây và thử lại.");
+        return;
+    }
+
+    // Tính tuổi
+    const currentYear = new Date().getFullYear();
+    userProfile.age = currentYear - userProfile.yob;
+    const isGroup1 = (userProfile.age >= 10 && userProfile.age <= 14);
+
+    // CHUẨN BỊ BỘ CÂU HỎI (Random 30 câu cân bằng)
+    quizData = generateBalancedQuiz(30).map(item => ({
+        ...item,
+        // Chọn ảnh phù hợp tuổi, nếu không có lấy ảnh placeholder
+        displayImg: (isGroup1 ? item.img1 : item.img2) || "https://via.placeholder.com/400x300?text=No+Image"
+    }));
+
+    // Chuyển giao diện
+    document.getElementById('info-form').style.display = 'none';
+    document.getElementById('quiz-screen').style.display = 'block';
+    document.getElementById('choice-btns').style.display = 'flex';
+    
+    renderCard(0);
+}
+
+function generateBalancedQuiz(totalCount) {
+    const countPerGroup = Math.floor(totalCount / 6); 
+    let selected = [];
+    const groups = ['R', 'I', 'A', 'S', 'E', 'C'];
+    
+    groups.forEach(g => {
+        let groupItems = rawData.filter(x => x.group && x.group.toUpperCase() === g);
+        // Shuffle
+        groupItems.sort(() => 0.5 - Math.random());
+        // Lấy 5 thẻ
+        selected = selected.concat(groupItems.slice(0, countPerGroup));
+    });
+    
+    // Shuffle lần cuối
+    return selected.sort(() => 0.5 - Math.random());
+}
+
+// --- PHẦN 3: HIỂN THỊ & TƯƠNG TÁC ---
+function renderCard(index) {
+    if (index >= quizData.length) {
+        finishQuiz();
+        return;
+    }
+
+    const data = quizData[index];
+    const container = document.getElementById('card-container');
+    
+    container.innerHTML = `
+        <div class="card-wrapper deal-animation" onclick="this.classList.toggle('is-flipped')">
+            <div class="card-face front">
+                <div class="card-image-wrapper">
+                    <img src="${data.displayImg}" alt="Job Image" onerror="this.src='https://via.placeholder.com/400?text=Ảnh+Lỗi'">
+                </div>
+                <h3>${data.name}</h3>
+                <p style="font-size:0.8em; color:#999; margin-top: auto;">(Chạm vào thẻ để lật)</p>
+            </div>
+            <div class="card-face back">
+                <h3 style="color:#333">Thông tin nghề</h3>
+                <p style="text-align:justify; padding:0 10px;">${data.desc}</p>
+                <div style="margin-top:auto; font-weight:bold; color:#007bff; border:1px solid #007bff; padding:5px 15px; border-radius:20px;">
+                    Nhóm: ${data.group}
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function handleChoice(isLike) {
+    const currentItem = quizData[currentCardIndex];
+    if (isLike) {
+        const g = currentItem.group.toUpperCase();
+        userProfile.scores[g] = (userProfile.scores[g] || 0) + 1;
+        userProfile.selectedCards.push(`${currentItem.name} (${g})`);
+    }
+    
+    currentCardIndex++;
+    // Delay nhỏ để tạo cảm giác mượt
+    setTimeout(() => renderCard(currentCardIndex), 200);
+}
+
+// --- PHẦN 4: KẾT QUẢ & AI & GỬI EMAIL ---
+function finishQuiz() {
+    document.getElementById('quiz-screen').style.display = 'none';
+    document.getElementById('result-section').style.display = 'block';
+
+    // Điền thông tin
+    document.getElementById('res-name').innerText = userProfile.name;
+    document.getElementById('res-info').innerText = `${userProfile.age} tuổi - ${userProfile.gender}`;
+    document.getElementById('res-email').innerText = userProfile.email;
+
+    // List các thẻ đã chọn
+    const listHtml = userProfile.selectedCards.map(item => `<li>${item}</li>`).join('');
+    document.getElementById('selected-cards-list').innerHTML = listHtml || "<li>Bạn không chọn hoạt động nào cụ thể.</li>";
+
+    // Gọi AI phân tích
+    callGeminiAnalysis();
+}
+
+async function callGeminiAnalysis() {
+    // Lấy top 3 nhóm điểm cao
+    const sortedScores = Object.entries(userProfile.scores).sort((a, b) => b[1] - a[1]);
+    const topGroups = sortedScores.slice(0, 3).map(x => x[0]).join(", ");
+    
+    // Prompt cho AI
+    const prompt = `
+        Bạn là chuyên gia tư vấn hướng nghiệp. Hãy phân tích cho người dùng:
+        - Tên: ${userProfile.name}, ${userProfile.age} tuổi, giới tính ${userProfile.gender}.
+        - Kết quả trắc nghiệm Holland (RIASEC) nổi trội ở các nhóm: ${topGroups || "Chưa rõ rệt"}.
+        
+        Hãy viết một báo cáo ngắn (định dạng HTML cơ bản, không dùng markdown ```html) gồm:
+        1. <b>Tính cách nổi bật:</b> Nhận xét dựa trên nhóm ${topGroups}.
+        2. <b>Môi trường làm việc phù hợp:</b> Mô tả không gian làm việc.
+        3. <b>Top 5 nghề nghiệp gợi ý:</b> Liệt kê cụ thể.
+        4. <b>Lời khuyên phát triển:</b> Ngắn gọn.
+        
+        Giọng văn tích cực, khuyến khích, dễ hiểu với lứa tuổi ${userProfile.age}.
+    `;
+
+    try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${CONFIG.AI_KEY}`;
+        const response = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+        });
+        
+        const data = await response.json();
+        const aiText = data.candidates[0].content.parts[0].text;
+        
+        // Lưu kết quả để gửi mail
+        userProfile.aiResultText = aiText;
+        
+        // Hiển thị ra màn hình
+        document.getElementById('ai-analysis').innerHTML = aiText;
+        
+    } catch (error) {
+        console.error("Lỗi AI:", error);
+        document.getElementById('ai-analysis').innerHTML = "<p style='color:red'>Hệ thống AI đang bận. Bạn vẫn có thể nhận kết quả qua Email.</p>";
+        userProfile.aiResultText = "Hệ thống AI không phản hồi lúc này. Tuy nhiên dựa trên điểm số, bạn thuộc nhóm nổi bật: " + topGroups;
+    }
+}
+
+// --- PHẦN 5: GỬI EMAIL (Kết nối Apps Script) ---
+function sendEmailReport() {
+    const btn = document.getElementById('btn-send-email');
+    btn.innerText = "⏳ Đang gửi dữ liệu...";
+    btn.disabled = true;
+
+    // Chuẩn bị dữ liệu gửi đi (Mapping với Google Apps Script của bạn)
+    // Script của bạn cần nhận các tham số này trong hàm doPost(e)
+    const formData = new FormData();
+    formData.append('name', userProfile.name);
+    formData.append('email', userProfile.email);
+    formData.append('age', userProfile.age);
+    formData.append('gender', userProfile.gender);
+    formData.append('top_groups', userProfile.selectedCards.join(", ")); // Hoặc gửi điểm số
+    formData.append('ai_analysis', userProfile.aiResultText); // Nội dung AI viết
+    
+    // Gửi request tới Google Apps Script
+    fetch(CONFIG.SCRIPT_URL, {
+        method: 'POST',
+        body: formData,
+        mode: 'no-cors' // Quan trọng: no-cors để tránh lỗi chặn từ trình duyệt khi gọi Google Script
+    })
+    .then(() => {
+        // Vì no-cors không trả về status chuẩn, ta giả định thành công nếu request đi được
+        alert(`✅ Đã gửi thành công!\nVui lòng kiểm tra hộp thư (cả mục Spam) của email: ${userProfile.email}`);
+        btn.innerText = "✔ Đã gửi xong";
+    })
+    .catch(error => {
+        console.error('Lỗi gửi mail:', error);
+        alert("Có lỗi khi gửi email. Vui lòng thử lại!");
+        btn.innerText = "Gửi lại";
+        btn.disabled = false;
+    });
+}
+
+// Tiện ích
+function toggleDetails() {
+    const el = document.getElementById('classification-details');
+    el.style.display = (el.style.display === 'none' || el.style.display === '') ? 'block' : 'none';
+}
+</script>
+
+</body>
+</html>
