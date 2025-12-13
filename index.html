@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>VSCC - Vietnam STEM Career Learning Card</title>
-    
     <style>
         /* --- NHÚNG FONT UTM AVO --- */
         @font-face {
@@ -24,45 +23,56 @@
             --success: #2ed573; --danger: #ff4757; --neutral: #f1c40f;
             --text: #2f3542; --bg: #e9ecef;
         }
+        
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
         body { 
             font-family: 'UTM Avo', sans-serif; margin: 0; padding: 0; 
             background: var(--bg); color: var(--text); 
-            height: 100vh; overflow: hidden; font-weight: 400;
+            height: 100vh; width: 100vw; overflow: hidden; /* App-like structure */
         }
+
         .app-container {
             max-width: 480px; height: 100%; margin: 0 auto; background: white; 
             position: relative; box-shadow: 0 0 20px rgba(0,0,0,0.05);
             display: flex; flex-direction: column; 
-            /* Sửa: Để hidden ở container, scroll ở từng screen */
-            overflow: hidden; 
         }
 
         /* --- SCREENS --- */
         .screen { 
             display: none; flex-direction: column; flex-grow: 1; 
-            padding: 20px; box-sizing: border-box; 
-            overflow-y: auto; /* Quan trọng: Cho phép cuộn nếu màn hình nhỏ */
-            animation: fadeIn 0.3s ease-out;
+            padding: 20px; 
+            overflow-y: auto; /* Cho phép cuộn nội dung bên trong */
+            -webkit-overflow-scrolling: touch; /* Cuộn mượt trên iOS */
+            height: 100%;
+            position: absolute; top: 0; left: 0; width: 100%; /* Đè lên nhau */
+            background: white; z-index: 10;
         }
-        .screen.active { display: flex; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .screen.active { display: flex; z-index: 20; }
 
         /* --- UI ELEMENTS --- */
-        h1, h2, h3, h4 { font-weight: 700; margin: 10px 0; color: var(--primary); }
+        h1, h2, h3, h4 { font-weight: 700; margin: 10px 0; color: var(--primary); text-align: center; }
         
-        /* NÚT VUÔNG TO (TRANG CHỦ) - Đã thêm z-index để tránh bị đè */
+        /* HOME SCREEN SPECIFIC */
+        #screen-home {
+            justify-content: center; /* Căn giữa dọc */
+            align-items: center; /* Căn giữa ngang */
+            padding-bottom: 80px; /* Chừa chỗ cho footer */
+        }
+
+        /* NÚT VUÔNG TO (TRANG CHỦ) */
         .home-grid { 
-            display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; 
-            position: relative; z-index: 10; 
+            display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px; 
+            width: 100%;
         }
         .btn-square {
-            aspect-ratio: 1/1; border: none; border-radius: 20px;
+            aspect-ratio: 1/1; border: none; border-radius: 25px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             font-family: 'UTM Avo', sans-serif; font-weight: 700; font-size: 18px;
-            cursor: pointer; color: white; transition: transform 0.1s;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+            cursor: pointer; color: white; box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            transform: translateY(0); transition: transform 0.1s;
         }
-        .btn-square:active { transform: scale(0.95); }
+        .btn-square:active { transform: translateY(3px); }
         .bg-blue { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
         .bg-purple { background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%); }
 
@@ -78,15 +88,14 @@
             border-radius: 10px; outline: none; font-family: 'UTM Avo', sans-serif; 
         }
         input:focus { border-color: var(--secondary); }
-        label { font-weight: 700; font-size: 14px; color: #555; }
+        label { font-weight: 700; font-size: 14px; color: #555; display:block; margin-bottom:5px; }
 
         /* --- SWIPE & CARDS --- */
         #video-section {
             width: 100%; aspect-ratio: 16/9; background: #000; 
             margin-bottom: 10px; border-radius: 12px; overflow: hidden;
-            display: none; animation: slideDown 0.3s;
+            display: none;
         }
-        @keyframes slideDown { from { height: 0; } to { height: auto; } }
         iframe { width: 100%; height: 100%; border: none; }
 
         #card-zone { position: relative; flex-grow: 1; margin: 10px 0; perspective: 1000px; min-height: 300px; }
@@ -136,17 +145,17 @@
         
         .ai-box { background: #eef2f5; padding: 15px; border-radius: 12px; font-size: 14px; margin-bottom: 20px; line-height: 1.6; }
 
-        /* FOOTER */
+        /* FOOTER (ABSOLUTE BOTTOM) */
         .app-footer { 
-            background: #f8f9fa; padding: 20px 10px; text-align: center; 
-            border-top: 1px solid #eee; margin-top: auto; font-size: 12px;
-            /* Đảm bảo footer không đè lên nội dung */
-            position: relative; z-index: 5;
+            position: absolute; bottom: 0; left: 0; width: 100%;
+            background: #f8f9fa; padding: 15px; text-align: center; 
+            border-top: 1px solid #eee; font-size: 11px;
+            z-index: 30; /* Luôn nổi trên cùng */
         }
-        .ft-main { font-weight: 700; color: var(--primary); margin: 0 0 5px; font-size: 14px; text-transform: uppercase; }
-        .ft-sub { font-weight: 400; font-style: italic; color: #555; margin: 0 0 10px; }
+        .ft-main { font-weight: 700; color: var(--primary); margin: 0 0 5px; font-size: 13px; text-transform: uppercase; }
+        .ft-sub { font-weight: 400; font-style: italic; color: #555; margin: 0 0 5px; }
         .ft-author { font-weight: 700; margin: 2px 0; }
-        .ft-aff { font-weight: 400; font-size: 11px; color: #666; }
+        .ft-aff { font-weight: 400; font-size: 10px; color: #666; }
 
         /* MODAL */
         #modal-info { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; display: none; justify-content: center; align-items: center; }
@@ -158,7 +167,7 @@
 <div class="app-container">
     
     <div id="screen-home" class="screen active">
-        <div style="text-align: center; margin-top: 40px;">
+        <div style="text-align: center;">
             <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" style="width: 100px;">
             <h2 style="color:var(--primary); font-size: 26px;">VSCC APP</h2>
             <p style="color:#777; font-weight: 400;">Vietnam STEM Career Learning Card</p>
@@ -166,18 +175,11 @@
         
         <div class="home-grid">
             <button class="btn-square bg-blue" onclick="goToScreen('screen-library')">
-                <span style="font-size:30px">🔍</span> TÌM HIỂU
+                <span style="font-size:30px">🔍</span> <br>TÌM HIỂU
             </button>
             <button class="btn-square bg-purple" onclick="goToScreen('screen-input')">
-                <span style="font-size:30px">🔮</span> DỰ ĐOÁN
+                <span style="font-size:30px">🔮</span> <br>DỰ ĐOÁN
             </button>
-        </div>
-
-        <div class="app-footer">
-            <h4 class="ft-main">Vietnam STEM Career Learning Card (VSCC)</h4>
-            <p class="ft-sub">Dự án "Thẻ học tập nghề nghiệp STEM"</p>
-            <p class="ft-author">BSc. Le Hoang Minh ft. MSc. Duong Thi Yen</p>
-            <p class="ft-aff">Faculty of Interdisciplinary Science @VNUHCM - University Of Science</p>
         </div>
     </div>
 
@@ -188,6 +190,7 @@
         </div>
         <input type="text" id="search-lib" placeholder="Tìm kiếm..." onkeyup="filterLib()">
         <div id="lib-container" class="lib-grid"></div>
+        <div style="height: 100px;"></div>
     </div>
 
     <div id="screen-input" class="screen">
@@ -201,6 +204,7 @@
         </div>
         <label>Email</label> <input type="email" id="inp-email">
         <button class="btn btn-primary" style="margin-top:20px" onclick="startQuiz()">BẮT ĐẦU ➔</button>
+        <div style="height: 100px;"></div>
     </div>
 
     <div id="screen-swipe" class="screen">
@@ -211,3 +215,263 @@
         
         <div id="video-section">
             <iframe id="video-frame" src="" allowfullscreen></iframe>
+        </div>
+
+        <div id="card-zone"></div>
+        
+        <div class="timer-bar-container">
+            <div id="timer-bar" class="timer-bar"></div>
+        </div>
+
+        <div class="control-bar">
+            <button class="action-btn btn-dislike" onclick="userSwipe('left')">✕</button>
+            <button class="action-btn btn-neutral" onclick="userSwipe('up')">🙂</button>
+            <button class="action-btn btn-like" onclick="userSwipe('right')">❤</button>
+        </div>
+        <p style="text-align:center; font-size:11px; color:#aaa; margin-top:-5px">Chạm vào thẻ để xem chi tiết & Video</p>
+        <div style="height: 80px;"></div>
+    </div>
+
+    <div id="screen-refine" class="screen">
+        <h3>Chọn Top 5 Nghề</h3>
+        <div id="refine-list" style="flex-grow:1; overflow-y:auto"></div>
+        <button id="btn-analyze" class="btn btn-primary" onclick="finishAndAnalyze()" disabled>PHÂN TÍCH</button>
+        <div style="height: 100px;"></div>
+    </div>
+
+    <div id="screen-result" class="screen">
+        <h3>Kết Quả Hướng Nghiệp</h3>
+        <div class="ai-box">
+            <b>Họ tên:</b> <span id="res-name"></span><br>
+            <b>Holland:</b> <span id="res-holland" style="color:var(--primary); font-weight:700"></span>
+        </div>
+        <div id="ai-content" class="ai-box" style="background:white; height:300px; overflow-y:auto">Đang phân tích...</div>
+        <button class="btn btn-primary" onclick="location.reload()">Làm lại</button>
+        <div style="height: 100px;"></div>
+    </div>
+
+    <div class="app-footer">
+        <h4 class="ft-main">Vietnam STEM Career Learning Card (VSCC)</h4>
+        <p class="ft-sub">Dự án "Thẻ học tập nghề nghiệp STEM"</p>
+        <p class="ft-author">BSc. Le Hoang Minh ft. MSc. Duong Thi Yen</p>
+        <p class="ft-aff">Faculty of Interdisciplinary Science @VNUHCM - University Of Science</p>
+    </div>
+
+</div>
+
+<div id="modal-info"><div class="modal-content" id="modal-body"></div></div>
+
+<script>
+    // --- HÀM CHUYỂN TRANG (Đặt lên đầu để đảm bảo load xong) ---
+    function goToScreen(id) {
+        console.log("Switching to:", id); 
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        const target = document.getElementById(id);
+        if(target) target.classList.add('active');
+    }
+
+    // --- CẤU HÌNH ---
+    const CONFIG = {
+        SHEET_CSV: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTn_AISCPAvNtkZZcjcMn4_80wXuarbci9SyqBqDnnHpB5WM1QShft3xU7HHxgIP_AKz9ffyoEsAd9D/pub?output=csv",
+        SCRIPT_URL: "" 
+    };
+
+    let rawData = [], mainQueue = [], retryQueue = [], user = { liked: [], scores: {} };
+    let currentItem = null, timerInterval = null;
+
+    window.onload = async () => {
+        try {
+            const res = await fetch(CONFIG.SHEET_CSV);
+            rawData = parseCSV(await res.text());
+            renderLibrary(rawData);
+        } catch(e) { console.error(e); }
+    };
+
+    function parseCSV(text) {
+        const lines = text.trim().split('\n'), res = [];
+        for(let i=1; i<lines.length; i++) {
+            const row = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+            if(row.length < 2) continue;
+            const c = t => t ? t.replace(/^"|"$/g, '').trim() : "";
+            res.push({
+                id: c(row[0]), nameVN: c(row[1]), nameEN: c(row[2]), group: c(row[3]),
+                img1: c(row[4]), img2: c(row[5]), desc: c(row[6]), subjects: c(row[7]),
+                qualities: c(row[8]), fact: c(row[9]), video: c(row[10]) || "" 
+            });
+        }
+        return res;
+    }
+
+    // --- LIBRARY ---
+    function renderLibrary(list) {
+        document.getElementById('lib-container').innerHTML = list.map(i => `
+            <div onclick="showLibModal('${i.id}')" style="background:white; border-radius:10px; overflow:hidden; box-shadow:0 2px 5px rgba(0,0,0,0.1); cursor:pointer">
+                <img src="${i.img2}" style="width:100%; aspect-ratio:4/3; object-fit:cover">
+                <div class="lib-info">${i.nameVN}</div>
+            </div>
+        `).join('');
+    }
+    function showLibModal(id) {
+        const i = rawData.find(x => x.id === id);
+        document.getElementById('modal-body').innerHTML = `
+            <h3>${i.nameVN}</h3><p style="font-weight:400">${i.desc}</p>
+            <button onclick="document.getElementById('modal-info').style.display='none'" style="width:100%; padding:10px; font-weight:700; cursor:pointer; border:1px solid #ddd; background:#f5f5f5; border-radius:8px">Đóng</button>
+        `;
+        document.getElementById('modal-info').style.display = 'flex';
+    }
+    function filterLib() {
+        const k = document.getElementById('search-lib').value.toLowerCase();
+        renderLibrary(rawData.filter(i => i.nameVN.toLowerCase().includes(k)));
+    }
+
+    // --- QUIZ ---
+    function startQuiz() {
+        const name = document.getElementById('inp-name').value;
+        const yob = document.getElementById('inp-yob').value;
+        if(!name || !yob) return alert("Vui lòng nhập Tên và Năm sinh");
+        
+        user = { name, yob, class: document.getElementById('inp-class').value, liked: [], scores: {} };
+        mainQueue = rawData.sort(()=>0.5-Math.random()).slice(0, 20);
+        retryQueue = [];
+        
+        goToScreen('screen-swipe');
+        loadNextCard();
+    }
+
+    function loadNextCard() {
+        if(mainQueue.length === 0) {
+            if(retryQueue.length > 0) {
+                alert("Hết thẻ chính. Chuyển sang thẻ xem lại.");
+                mainQueue = retryQueue; retryQueue = [];
+            } else { return finishQuiz(); }
+        }
+        currentItem = mainQueue.shift();
+        renderCard(currentItem);
+        startTimer();
+    }
+
+    function renderCard(item) {
+        document.getElementById('video-section').style.display = 'none';
+        document.getElementById('video-frame').src = "";
+        const html = `
+        <div class="tinder-card" id="active-card" onclick="flipCard()">
+            <div class="card-face card-front">
+                <img src="${item.img2}" draggable="false">
+                <div class="card-overlay">
+                    <h2 class="card-title-vn">${item.nameVN}</h2>
+                    <p class="card-title-en">${item.nameEN}</p>
+                </div>
+            </div>
+            <div class="card-face card-back">
+                <div class="back-header">
+                    <h3 style="margin:0; font-size:20px">${item.nameVN}</h3>
+                    <small style="font-weight:700; color:#666">${item.group}</small>
+                </div>
+                <div class="back-content">
+                    <p><b>Mô tả:</b> ${item.desc}</p>
+                    <p><b>Môn học:</b> ${item.subjects}</p>
+                    <p><b>Thú vị:</b> ${item.fact}</p>
+                </div>
+            </div>
+        </div>`;
+        document.getElementById('card-zone').innerHTML = html;
+        document.getElementById('progress-count').innerText = "Còn: " + (mainQueue.length + retryQueue.length + 1);
+    }
+
+    function flipCard() {
+        const card = document.getElementById('active-card');
+        card.classList.toggle('is-flipped');
+        
+        const vidSec = document.getElementById('video-section');
+        if(card.classList.contains('is-flipped')) {
+            vidSec.style.display = 'block';
+            const vidUrl = currentItem.video 
+                ? (currentItem.video.replace("watch?v=", "embed/")) 
+                : `https://www.youtube.com/embed?listType=search&list=nghề ${currentItem.nameVN}`;
+            document.getElementById('video-frame').src = vidUrl;
+        } else {
+            vidSec.style.display = 'none';
+            document.getElementById('video-frame').src = "";
+        }
+    }
+
+    function startTimer() {
+        clearInterval(timerInterval);
+        const bar = document.getElementById('timer-bar');
+        bar.style.transition = 'none'; bar.style.width = '100%';
+        setTimeout(() => { bar.style.transition = 'width 5s linear'; bar.style.width = '0%'; }, 10);
+        timerInterval = setTimeout(() => { userSwipe('down'); }, 5000);
+    }
+
+    function userSwipe(dir) {
+        clearInterval(timerInterval);
+        const card = document.getElementById('active-card');
+        if(!card) return;
+
+        card.style.transition = 'transform 0.5s ease-out, opacity 0.5s';
+        let tr = '';
+        if(dir === 'left') tr = 'translateX(-150%) rotate(-30deg)';
+        if(dir === 'right') tr = 'translateX(150%) rotate(30deg)';
+        if(dir === 'up') tr = 'translateY(-150%)';
+        if(dir === 'down') tr = 'translateY(150%)';
+
+        card.style.transform = tr; card.style.opacity = '0';
+
+        if(dir === 'right') {
+            user.liked.push(currentItem);
+            const g = currentItem.group.charAt(0);
+            user.scores[g] = (user.scores[g] || 0) + 1;
+        } else if (dir === 'down') { retryQueue.push(currentItem); }
+        setTimeout(loadNextCard, 400);
+    }
+
+    function finishQuiz() {
+        goToScreen('screen-refine');
+        const list = document.getElementById('refine-list');
+        if(user.liked.length === 0) list.innerHTML = "<p>Bạn chưa thích nghề nào.</p>";
+        else list.innerHTML = user.liked.map(i => `
+            <div onclick="toggleRefine('${i.id}', this)" style="padding:10px; border:1px solid #ddd; margin-bottom:5px; border-radius:5px; cursor:pointer; font-weight:700">
+                ${i.nameVN}
+            </div>`).join('');
+    }
+
+    let finalSelection = [];
+    function toggleRefine(id, el) {
+        if(el.style.background === 'rgb(240, 255, 244)') {
+            el.style.background = 'white';
+            finalSelection = finalSelection.filter(x => x.id !== id);
+        } else {
+            if(finalSelection.length >= 5) return alert("Chỉ chọn tối đa 5 nghề");
+            el.style.background = '#f0fff4';
+            finalSelection.push(user.liked.find(x => x.id === id));
+        }
+        document.getElementById('btn-analyze').disabled = (finalSelection.length === 0);
+    }
+
+    function finishAndAnalyze() {
+        goToScreen('screen-result');
+        document.getElementById('res-name').innerText = user.name;
+        document.getElementById('ai-content').innerText = "Đang kết nối Gemini AI...";
+        
+        const sorted = Object.entries(user.scores).sort((a,b) => b[1] - a[1]);
+        const topHolland = sorted.slice(0,2).map(i => i[0]).join("");
+        document.getElementById('res-holland').innerText = topHolland || "Chưa rõ";
+        
+        const prompt = `Học sinh: ${user.name}, Lớp ${user.class}. Holland: ${topHolland}. Nghề chọn: ${finalSelection.map(i=>i.nameVN).join(', ')}. Viết báo cáo ngắn gọn.`;
+        
+        if (typeof google !== 'undefined') {
+             google.script.run
+            .withSuccessHandler(res => { 
+                if(res.status === 'success') document.getElementById('ai-content').innerHTML = res.text;
+                else document.getElementById('ai-content').innerText = "Lỗi: " + res.message;
+            })
+            .callGeminiAI(prompt);
+        } else {
+            document.getElementById('ai-content').innerText = "Chế độ Test: Không có kết nối Google Script.";
+        }
+    }
+    
+    function quitQuiz() { if(confirm("Thoát?")) goToScreen('screen-home'); }
+</script>
+</body>
+</html>
