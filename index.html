@@ -93,6 +93,15 @@
         input:focus { border-color: var(--secondary); background: #fdfdfd; }
         input::placeholder { color: #bbb; font-style: italic; font-size: 13px; }
 
+        /* Gender Select */
+        .gender-group { display: flex; gap: 15px; margin-bottom: 15px; }
+        .gender-btn {
+            flex: 1; padding: 12px; border: 1px solid #eee; border-radius: 10px;
+            text-align: center; cursor: pointer; font-weight: 700; color: #666;
+            transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .gender-btn.selected { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 4px 10px rgba(78, 84, 200, 0.2); }
+
         /* --- HOME SCREEN --- */
         #screen-home { justify-content: center; align-items: center; }
         .home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; }
@@ -137,8 +146,9 @@
 
         /* Card Zone Adjustment */
         #card-zone { 
-            position: relative; flex-grow: 1; margin: 5px 0 15px 0; 
-            perspective: 1000px; min-height: 280px; 
+            position: relative; flex-grow: 1; margin: 5px 0 10px 0; 
+            perspective: 1000px; 
+            min-height: 250px; /* Giảm chiều cao tối thiểu để nhường chỗ cho logo */
         }
         
         .tinder-card {
@@ -270,6 +280,12 @@
                 <div style="flex:1"><label>Năm sinh</label> <input type="number" id="inp-yob" placeholder="VD: 2008"></div>
                 <div style="flex:1"><label>Lớp</label> <input type="text" id="inp-class" placeholder="VD: 9A1"></div>
             </div>
+
+            <label>Giới tính</label>
+            <div class="gender-group">
+                <div class="gender-btn selected" id="gender-male" onclick="selectGender('Nam')">♂ Nam</div>
+                <div class="gender-btn" id="gender-female" onclick="selectGender('Nữ')">♀ Nữ</div>
+            </div>
             
             <label>Email (Để nhận kết quả chi tiết)</label> <input type="email" id="inp-email" placeholder="VD: email@example.com">
             
@@ -278,8 +294,8 @@
         </div>
 
         <div id="screen-swipe" class="screen">
-            <div style="display:flex; justify-content:center; align-items:center; padding-bottom:5px;">
-                <img src="https://png.pngtree.com/png-vector/20220812/ourmid/pngtree-people-logo-vector-icon-meeting-vector-community-vector-png-image_38581676.png" style="height: 40px; object-fit: contain;">
+            <div style="display:flex; justify-content:center; align-items:center; padding: 5px 0 15px 0;">
+                <img src="https://png.pngtree.com/png-vector/20220812/ourmid/pngtree-people-logo-vector-icon-meeting-vector-community-vector-png-image_38581676.png" style="height: 80px; object-fit: contain;">
             </div>
 
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
@@ -311,7 +327,7 @@
 
             <div class="result-card">
                 <div class="res-label">Hồ sơ cá nhân</div>
-                <div class="res-value"><b id="res-name">Tên</b> - <span id="res-class">Lớp</span></div>
+                <div class="res-value"><b id="res-name">Tên</b> - <span id="res-class">Lớp</span> (<span id="res-gender"></span>)</div>
                 <div class="res-value" style="font-size: 14px; color: #666; margin-top: 5px;" id="res-email">email</div>
             </div>
 
@@ -395,7 +411,7 @@
         'C': { color: 'var(--color-C)', vn: 'Nghiệp vụ', en: 'Conventional' }
     };
 
-    let rawData = [], mainQueue = [], retryQueue = [], user = { liked: [], disliked: [], neutral: [], scores: {} };
+    let rawData = [], mainQueue = [], retryQueue = [], user = { gender:'Nam', liked: [], disliked: [], neutral: [], scores: {} };
     let currentItem = null, timerInterval = null, aiResultText = "";
 
     window.onload = async () => {
@@ -437,6 +453,14 @@
             html += `<div class="h-desc">${codeStr} (${descParts.join(' - ')})</div>`;
         }
         return html;
+    }
+
+    /* --- GENDER SELECT --- */
+    function selectGender(g) {
+        user.gender = g;
+        document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('selected'));
+        if(g === 'Nam') document.getElementById('gender-male').classList.add('selected');
+        else document.getElementById('gender-female').classList.add('selected');
     }
 
     /* --- LIBRARY --- */
@@ -511,11 +535,12 @@
         const yob = document.getElementById('inp-yob').value;
         if(!name || !yob) return alert("Vui lòng nhập Tên và Năm sinh!");
         
-        user = { 
-            name, yob, class: document.getElementById('inp-class').value, 
-            email: document.getElementById('inp-email').value, 
-            liked: [], disliked: [], neutral: [], scores: {} 
-        };
+        // Save info to user obj (keep gender from selection)
+        user.name = name;
+        user.yob = yob;
+        user.class = document.getElementById('inp-class').value;
+        user.email = document.getElementById('inp-email').value;
+        user.liked = []; user.disliked = []; user.neutral = []; user.scores = {};
         
         // Randomize Order
         mainQueue = rawData.slice().sort(()=>0.5-Math.random()).slice(0, 20);
@@ -618,6 +643,7 @@
         document.getElementById('res-name').innerText = user.name;
         document.getElementById('res-class').innerText = user.class || "?";
         document.getElementById('res-email').innerText = user.email || "";
+        document.getElementById('res-gender').innerText = user.gender;
 
         const sorted = Object.entries(user.scores).sort((a,b) => b[1] - a[1]);
         let topHolland = "";
@@ -625,10 +651,10 @@
         if(sorted.length > 1) topHolland += sorted[1][0];
 
         const prompt = `
-            Học sinh: ${user.name}, Lớp: ${user.class}, Năm sinh: ${user.yob}.
+            Học sinh: ${user.name}, Giới tính: ${user.gender}, Lớp: ${user.class}, Năm sinh: ${user.yob}.
             Kết quả Holland: ${topHolland}.
             Thích: ${user.liked.map(i=>i.nameVN).join(', ')}.
-            Viết báo cáo HTML (body only): 1. Sở thích. 2. Tính cách. 3. Mã Holland.
+            Viết báo cáo HTML (body only) gồm: 1. Sở thích. 2. Tính cách. 3. Mã Holland.
         `;
         
         if (typeof google !== 'undefined') {
@@ -675,7 +701,7 @@
 
     function restartApp() {
         if(confirm("Làm lại từ đầu?")) {
-            user = { liked: [], disliked: [], neutral: [], scores: {} };
+            user = { liked: [], disliked: [], neutral: [], scores: {}, gender: user.gender };
             goToScreen('screen-input');
         }
     }
