@@ -78,7 +78,16 @@
 
         /* --- TYPOGRAPHY & ELEMENTS --- */
         h1, h2, h3, h4 { font-weight: 700; margin: 10px 0; color: var(--primary); text-align: center; }
-        .logo-img { width: 100px; height: auto; object-fit: contain; margin-bottom: 10px; }
+        
+        /* LOGO STYLE - UPDATED SIZE */
+        .logo-img { 
+            width: 150px; /* Tăng kích thước logo */
+            height: auto; object-fit: contain; 
+            margin-bottom: 15px; 
+            transition: transform 0.3s;
+        }
+        /* Hiệu ứng nhẹ khi chạm vào logo */
+        .logo-img:active { transform: scale(0.95); }
 
         /* Buttons */
         .btn { width: 100%; padding: 15px; border: none; border-radius: 12px; font-family: 'UTM Avo', sans-serif; font-weight: 700; font-size: 16px; cursor: pointer; margin-bottom: 10px; transition: 0.2s; }
@@ -110,17 +119,16 @@
         .bg-blue { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
         .bg-purple { background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%); }
 
-        /* --- LIBRARY SCREEN (UPDATED) --- */
+        /* --- LIBRARY SCREEN --- */
         .lib-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding-bottom: 20px; }
         .lib-card { 
             background: white; border-radius: 12px; overflow: hidden; position: relative;
             box-shadow: 0 4px 10px rgba(0,0,0,0.08); cursor: pointer; 
             transition: transform 0.2s; border: 1px solid #f0f0f0;
         }
-        .lib-card:active { transform: scale(0.97); }
+        .lib-card:active { transform: scale(0.95); }
         .lib-card img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; }
         
-        /* Badge Holland */
         .holland-badge {
             position: absolute; top: 8px; left: 8px;
             width: 28px; height: 28px; background: white;
@@ -130,7 +138,6 @@
         }
 
         .lib-info { padding: 10px; text-align: center; }
-        /* Tên nghề không rớt dòng */
         .lib-name-vn { 
             font-weight: 700; font-size: 14px; color: #333; display: block; 
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -196,25 +203,37 @@
         }
         .res-label { font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; font-weight: 700; }
         .res-value { font-size: 16px; color: #333; font-weight: 400; }
-        
         .holland-display { font-size: 36px; font-weight: 700; letter-spacing: 2px; margin: 10px 0; }
         .h-char { display: inline-block; }
         .h-desc { font-size: 14px; font-style: italic; color: #555; }
 
-        /* --- MODAL --- */
+        /* --- MODAL (Animation & Design) --- */
         #modal-info, #modal-classification { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(0,0,0,0.85); z-index: 200; display: none; 
             justify-content: center; align-items: center; 
+            perspective: 1000px; /* Cho hiệu ứng 3D */
         }
+        
         .modal-card { 
             background: white; width: 90%; max-height: 85vh; border-radius: 20px; 
             overflow-y: auto; position: relative; display: flex; flex-direction: column;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            /* Zoom Effect */
+            transform: scale(0.8) translateY(50px);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
+        
+        /* Class active để kích hoạt animation */
+        .modal-card.zoom-in {
+            transform: scale(1) translateY(0);
+            opacity: 1;
+        }
+
         .modal-header { padding: 20px; background: #f8f9fa; border-bottom: 1px solid #eee; text-align: center; }
         .modal-body { padding: 20px; font-size: 14px; line-height: 1.6; color: #444; }
-        .modal-close { position: absolute; top: 15px; right: 15px; font-size: 24px; color: #999; cursor: pointer; z-index: 10; }
+        .modal-close { position: absolute; top: 15px; right: 15px; font-size: 28px; color: #999; cursor: pointer; z-index: 10; font-weight: bold; }
         
         .class-col { margin-bottom: 15px; }
         .class-head { font-weight: 700; margin-bottom: 5px; display: block; }
@@ -339,7 +358,7 @@
 </div>
 
 <div id="modal-info">
-    <div class="modal-card">
+    <div class="modal-card" id="lib-modal-card">
         <span class="modal-close" onclick="closeModal()">×</span>
         <div class="modal-header">
             <h3 id="m-title-vn" style="margin:0; font-size: 20px;">Tên Nghề</h3>
@@ -357,15 +376,14 @@
             <hr style="border:0; border-top:1px dashed #eee; margin: 20px 0;">
             
             <div style="font-weight: 700; font-size: 13px; color:#555; margin-bottom:5px">HÌNH ẢNH & VIDEO MINH HỌA</div>
-            <div id="m-media-container" style="width:100%; aspect-ratio:4/3; background:#f0f0f0; border-radius:10px; overflow:hidden;">
-                </div>
+            <div id="m-media-container" style="width:100%; aspect-ratio:4/3; background:#f0f0f0; border-radius:10px; overflow:hidden;"></div>
         </div>
     </div>
 </div>
 
 <div id="modal-classification">
-    <div class="modal-card">
-        <span class="modal-close" onclick="document.getElementById('modal-classification').style.display='none'">×</span>
+    <div class="modal-card" id="class-modal-card">
+        <span class="modal-close" onclick="closeModalClass()">×</span>
         <div class="modal-header"><h3>Kết Quả Phân Loại</h3></div>
         <div class="modal-body">
             <div class="class-col">
@@ -406,7 +424,7 @@
             const res = await fetch(CONFIG.SHEET_CSV);
             rawData = parseCSV(await res.text());
             
-            // Randomize for Library View immediately on load
+            // Random Library
             const libraryData = rawData.slice().sort(() => 0.5 - Math.random());
             renderLibrary(libraryData);
         } catch(e) { console.error(e); }
@@ -445,10 +463,8 @@
     /* --- LIBRARY --- */
     function renderLibrary(list) {
         document.getElementById('lib-container').innerHTML = list.map(i => {
-            // Lấy chữ cái đầu tiên của Group làm mã
             const code = i.group.charAt(0).toUpperCase();
             const color = HOLLAND_MAP[code] ? HOLLAND_MAP[code].color : 'var(--primary)';
-            
             return `
             <div class="lib-card" onclick="showLibModal('${i.id}')">
                 <div class="holland-badge" style="color: ${color}">${code}</div>
@@ -473,22 +489,32 @@
         document.getElementById('m-fact').innerText = item.fact;
         document.getElementById('m-group').innerHTML = renderHollandFancy(item.group);
 
-        // Media at Bottom (Video or Image)
         const mediaCon = document.getElementById('m-media-container');
         if(item.video) {
              const vidUrl = item.video.replace("watch?v=", "embed/");
              mediaCon.innerHTML = `<iframe src="${vidUrl}" style="width:100%; height:100%; border:none"></iframe>`;
         } else {
-             // Fallback to Image if no video
              mediaCon.innerHTML = `<img src="${item.img2}" style="width:100%; height:100%; object-fit:cover">`;
         }
         
         document.getElementById('modal-info').style.display = 'flex';
+        // Trigger Animation
+        setTimeout(() => document.getElementById('lib-modal-card').classList.add('zoom-in'), 10);
     }
     
     function closeModal() {
-        document.getElementById('modal-info').style.display = 'none';
-        document.getElementById('m-media-container').innerHTML = ""; // Stop video
+        document.getElementById('lib-modal-card').classList.remove('zoom-in');
+        setTimeout(() => {
+            document.getElementById('modal-info').style.display = 'none';
+            document.getElementById('m-media-container').innerHTML = "";
+        }, 300);
+    }
+    
+    function closeModalClass() {
+        document.getElementById('class-modal-card').classList.remove('zoom-in');
+        setTimeout(() => {
+            document.getElementById('modal-classification').style.display = 'none';
+        }, 300);
     }
     
     function filterLib() {
@@ -624,7 +650,7 @@
             Học sinh: ${user.name}, Lớp: ${user.class}, Năm sinh: ${user.yob}.
             Kết quả Holland: ${topHolland}.
             Thích: ${user.liked.map(i=>i.nameVN).join(', ')}.
-            Viết báo cáo HTML (body only): 1. Sở thích. 2. Tính cách. 3. Mã Holland.
+            Viết báo cáo HTML (body only) gồm: 1. Sở thích. 2. Tính cách. 3. Mã Holland.
         `;
         
         if (typeof google !== 'undefined') {
@@ -645,7 +671,9 @@
         document.getElementById('list-liked').innerHTML = user.liked.map(i=>`<div class='class-list-item'>${i.nameVN}</div>`).join('') || "<i>Trống</i>";
         document.getElementById('list-neutral').innerHTML = user.neutral.map(i=>`<div class='class-list-item'>${i.nameVN}</div>`).join('') || "<i>Trống</i>";
         document.getElementById('list-disliked').innerHTML = user.disliked.map(i=>`<div class='class-list-item'>${i.nameVN}</div>`).join('') || "<i>Trống</i>";
+        
         document.getElementById('modal-classification').style.display = 'flex';
+        setTimeout(() => document.getElementById('class-modal-card').classList.add('zoom-in'), 10);
     }
 
     function sendEmail() {
