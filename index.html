@@ -24,12 +24,8 @@
             --text: #2f3542; --bg: #e9ecef;
             
             /* Màu Holland */
-            --color-R: #ff4757;
-            --color-I: #ffa502;
-            --color-A: #ff6b81;
-            --color-S: #2ed573;
-            --color-E: #1e90ff;
-            --color-C: #5352ed;
+            --color-R: #ff4757; --color-I: #ffa502; --color-A: #ff6b81;
+            --color-S: #2ed573; --color-E: #1e90ff; --color-C: #5352ed;
         }
         
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -76,17 +72,9 @@
         .ft-author { font-weight: 700; margin: 2px 0; font-size: 11px; color: #333; }
         .ft-aff { font-weight: 400; font-size: 10px; color: #666; margin: 0; }
 
-        /* --- TYPOGRAPHY & ELEMENTS --- */
+        /* --- UI ELEMENTS --- */
         h1, h2, h3, h4 { font-weight: 700; margin: 10px 0; color: var(--primary); text-align: center; }
-        
-        /* LOGO STYLE - UPDATED SIZE */
-        .logo-img { 
-            width: 150px; /* Tăng kích thước logo */
-            height: auto; object-fit: contain; 
-            margin-bottom: 15px; 
-            transition: transform 0.3s;
-        }
-        /* Hiệu ứng nhẹ khi chạm vào logo */
+        .logo-img { width: 150px; height: auto; object-fit: contain; margin-bottom: 15px; transition: transform 0.2s; }
         .logo-img:active { transform: scale(0.95); }
 
         /* Buttons */
@@ -130,22 +118,13 @@
         .lib-card img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; }
         
         .holland-badge {
-            position: absolute; top: 8px; left: 8px;
-            width: 28px; height: 28px; background: white;
+            position: absolute; top: 8px; left: 8px; width: 28px; height: 28px; background: white;
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-weight: 700; font-size: 12px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 5;
+            font-weight: 700; font-size: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 5;
         }
-
         .lib-info { padding: 10px; text-align: center; }
-        .lib-name-vn { 
-            font-weight: 700; font-size: 14px; color: #333; display: block; 
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-        }
-        .lib-name-en { 
-            font-weight: 400; font-size: 11px; color: #888; font-style: italic; 
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-        }
+        .lib-name-vn { font-weight: 700; font-size: 14px; color: #333; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .lib-name-en { font-weight: 400; font-size: 11px; color: #888; font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         /* --- SWIPE SCREEN --- */
         #video-section {
@@ -156,7 +135,12 @@
         @keyframes slideDown { from { height: 0; } to { height: auto; } }
         iframe { width: 100%; height: 100%; border: none; }
 
-        #card-zone { position: relative; flex-grow: 1; margin: 10px 0; perspective: 1000px; min-height: 320px; }
+        /* Card Zone Adjustment */
+        #card-zone { 
+            position: relative; flex-grow: 1; margin: 5px 0 15px 0; 
+            perspective: 1000px; min-height: 280px; 
+        }
+        
         .tinder-card {
             position: absolute; width: 100%; height: 100%; 
             transform-style: preserve-3d; transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
@@ -207,34 +191,23 @@
         .h-char { display: inline-block; }
         .h-desc { font-size: 14px; font-style: italic; color: #555; }
 
-        /* --- MODAL (Animation & Design) --- */
+        /* --- MODAL --- */
         #modal-info, #modal-classification { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(0,0,0,0.85); z-index: 200; display: none; 
-            justify-content: center; align-items: center; 
-            perspective: 1000px; /* Cho hiệu ứng 3D */
+            justify-content: center; align-items: center; perspective: 1000px;
         }
-        
         .modal-card { 
             background: white; width: 90%; max-height: 85vh; border-radius: 20px; 
             overflow-y: auto; position: relative; display: flex; flex-direction: column;
             box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            /* Zoom Effect */
-            transform: scale(0.8) translateY(50px);
-            opacity: 0;
+            transform: scale(0.8) translateY(50px); opacity: 0;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        
-        /* Class active để kích hoạt animation */
-        .modal-card.zoom-in {
-            transform: scale(1) translateY(0);
-            opacity: 1;
-        }
-
+        .modal-card.zoom-in { transform: scale(1) translateY(0); opacity: 1; }
         .modal-header { padding: 20px; background: #f8f9fa; border-bottom: 1px solid #eee; text-align: center; }
         .modal-body { padding: 20px; font-size: 14px; line-height: 1.6; color: #444; }
         .modal-close { position: absolute; top: 15px; right: 15px; font-size: 28px; color: #999; cursor: pointer; z-index: 10; font-weight: bold; }
-        
         .class-col { margin-bottom: 15px; }
         .class-head { font-weight: 700; margin-bottom: 5px; display: block; }
         .class-list-item { font-size: 13px; padding: 5px 0; border-bottom: 1px dashed #eee; }
@@ -283,8 +256,12 @@
             <button onclick="goToScreen('screen-home')" style="background:none; border:none; font-size:24px; text-align:left; color:#555; cursor:pointer; width: fit-content;">←</button>
             
             <div style="text-align: center; margin-bottom: 20px;">
-                <img src="https://png.pngtree.com/png-vector/20220812/ourmid/pngtree-people-logo-vector-icon-meeting-vector-community-vector-png-image_38581676.png" class="logo-img" style="width: 80px;">
-                <h3>Nhập Thông Tin</h3>
+                <img src="https://png.pngtree.com/png-vector/20220812/ourmid/pngtree-people-logo-vector-icon-meeting-vector-community-vector-png-image_38581676.png" class="logo-img" style="width: 120px;">
+                <div style="font-weight: 800; color: var(--primary); font-size: 14px; margin-bottom: 5px;">PHÂN TÍCH HỘ CHIẾU CÔNG DÂN</div>
+                <h3>Thông tin Công dân tương lai</h3>
+                <p style="font-size: 13px; color: #666; font-style: italic; margin-top: 10px;">
+                    Chào mừng bạn đến với hành trình kiến tạo tương lai! Hãy nhập thông tin để AI giúp bạn tìm ra "tọa độ" nghề nghiệp chính xác nhất nhé.
+                </p>
             </div>
             
             <label>Họ và tên</label> <input type="text" id="inp-name" placeholder="VD: Nguyễn Văn A">
@@ -301,7 +278,11 @@
         </div>
 
         <div id="screen-swipe" class="screen">
-            <div style="display:flex; justify-content:space-between; align-items:center">
+            <div style="display:flex; justify-content:center; align-items:center; padding-bottom:5px;">
+                <img src="https://png.pngtree.com/png-vector/20220812/ourmid/pngtree-people-logo-vector-icon-meeting-vector-community-vector-png-image_38581676.png" style="height: 40px; object-fit: contain;">
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
                 <small style="color:#999; font-weight:700">Thẻ: <span id="progress-count">0/0</span></small>
                 <button onclick="quitQuiz()" style="border:none; background:none; color:#666; font-family:'UTM Avo'; font-weight:700; cursor:pointer">Thoát</button>
             </div>
@@ -372,9 +353,7 @@
             <div style="background: #fff3cd; padding: 10px; border-radius: 8px; margin-top: 15px; font-size: 13px;">
                 💡 <b>Thú vị:</b> <span id="m-fact"></span>
             </div>
-            
             <hr style="border:0; border-top:1px dashed #eee; margin: 20px 0;">
-            
             <div style="font-weight: 700; font-size: 13px; color:#555; margin-bottom:5px">HÌNH ẢNH & VIDEO MINH HỌA</div>
             <div id="m-media-container" style="width:100%; aspect-ratio:4/3; background:#f0f0f0; border-radius:10px; overflow:hidden;"></div>
         </div>
@@ -387,15 +366,15 @@
         <div class="modal-header"><h3>Kết Quả Phân Loại</h3></div>
         <div class="modal-body">
             <div class="class-col">
-                <span class="class-head" style="color:var(--success)">❤ THÍCH</span>
+                <span class="class-head" style="color:var(--success)">❤ THÍCH (Vuốt Phải)</span>
                 <div id="list-liked"></div>
             </div>
             <div class="class-col">
-                <span class="class-head" style="color:var(--neutral)">🙂 BÌNH THƯỜNG</span>
+                <span class="class-head" style="color:var(--neutral)">🙂 BÌNH THƯỜNG (Vuốt Lên)</span>
                 <div id="list-neutral"></div>
             </div>
             <div class="class-col">
-                <span class="class-head" style="color:var(--danger)">✕ KHÔNG THÍCH</span>
+                <span class="class-head" style="color:var(--danger)">✕ KHÔNG THÍCH (Vuốt Trái)</span>
                 <div id="list-disliked"></div>
             </div>
         </div>
@@ -498,7 +477,6 @@
         }
         
         document.getElementById('modal-info').style.display = 'flex';
-        // Trigger Animation
         setTimeout(() => document.getElementById('lib-modal-card').classList.add('zoom-in'), 10);
     }
     
@@ -650,7 +628,7 @@
             Học sinh: ${user.name}, Lớp: ${user.class}, Năm sinh: ${user.yob}.
             Kết quả Holland: ${topHolland}.
             Thích: ${user.liked.map(i=>i.nameVN).join(', ')}.
-            Viết báo cáo HTML (body only) gồm: 1. Sở thích. 2. Tính cách. 3. Mã Holland.
+            Viết báo cáo HTML (body only): 1. Sở thích. 2. Tính cách. 3. Mã Holland.
         `;
         
         if (typeof google !== 'undefined') {
