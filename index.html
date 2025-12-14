@@ -1,763 +1,213 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Hộ Chiếu Tương Lai - VSCC</title>
-    <style>
-        /* --- FONT UTM AVO --- */
-        @font-face {
-            font-family: 'UTM Avo';
-            src: url('https://cdn.jsdelivr.net/gh/hung1001/font-utm-avo/UTMAvo.woff2') format('woff2');
-            font-weight: 400; font-style: normal; font-display: swap;
-        }
-        @font-face {
-            font-family: 'UTM Avo';
-            src: url('https://cdn.jsdelivr.net/gh/hung1001/font-utm-avo/UTMAvoBold.woff2') format('woff2');
-            font-weight: 700; font-style: normal; font-display: swap;
-        }
-
-        /* --- CSS RESET & BASE --- */
-        :root {
-            --primary: #4e54c8; --secondary: #8f94fb;
-            --success: #2ed573; --danger: #ff4757; --neutral: #f1c40f;
-            --text: #2f3542; --bg: #e9ecef;
-            
-            /* Màu Holland */
-            --color-R: #ff4757; --color-I: #ffa502; --color-A: #ff6b81;
-            --color-S: #2ed573; --color-E: #1e90ff; --color-C: #5352ed;
-        }
-        
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-        body { 
-            font-family: 'UTM Avo', sans-serif; margin: 0; padding: 0; 
-            background: var(--bg); color: var(--text); 
-            height: 100vh; width: 100vw; overflow: hidden;
-            display: flex; flex-direction: column;
-        }
-
-        .app-container {
-            max-width: 480px; height: 100%; margin: 0 auto; background: white; 
-            box-shadow: 0 0 20px rgba(0,0,0,0.05);
-            display: flex; flex-direction: column; 
-            position: relative;
-        }
-
-        /* --- MAIN CONTENT AREA --- */
-        .main-content {
-            flex-grow: 1; position: relative; overflow: hidden; 
-            display: flex; flex-direction: column;
-        }
-
-        .screen { 
-            display: none; flex-direction: column; 
-            width: 100%; height: 100%; 
-            padding: 20px; 
-            padding-top: calc(20px + env(safe-area-inset-top));
-            
-            overflow-y: auto; -webkit-overflow-scrolling: touch;
-            background: white; animation: fadeIn 0.3s ease-out;
-        }
-        .screen.active { display: flex; }
-        
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* --- FOOTER --- */
-        .app-footer { 
-            flex-shrink: 0; 
-            background: #f8f9fa; padding: 15px 10px; text-align: center; 
-            border-top: 2px solid #eee; z-index: 100;
-            padding-bottom: calc(15px + env(safe-area-inset-bottom));
-        }
-        .ft-main { font-weight: 700; color: var(--primary); margin: 0; font-size: 13px; text-transform: uppercase; }
-        .ft-sub { font-weight: 400; font-style: italic; color: #555; margin: 2px 0; font-size: 11px; }
-        .ft-author { font-weight: 700; margin: 2px 0; font-size: 11px; color: #333; }
-        .ft-aff { font-weight: 400; font-size: 10px; color: #666; margin: 0; }
-
-        /* --- UI ELEMENTS --- */
-        h1, h2, h3, h4 { font-weight: 700; margin: 10px 0; color: var(--primary); text-align: center; }
-        
-        /* LOGO STYLE */
-        .logo-img { 
-            width: 150px; height: auto; object-fit: contain; 
-            margin-bottom: 15px; transition: transform 0.2s; 
-        }
-        .logo-img:active { transform: scale(0.95); }
-
-        /* Buttons */
-        .btn { width: 100%; padding: 15px; border: none; border-radius: 12px; font-family: 'UTM Avo', sans-serif; font-weight: 700; font-size: 16px; cursor: pointer; margin-bottom: 10px; transition: 0.2s; display: flex; align-items: center; justify-content: center;}
-        .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(78, 84, 200, 0.3); }
-        .btn-outline { background: white; border: 2px solid var(--primary); color: var(--primary); }
-        .btn-secondary { background: #6c757d; color: white; }
-        .btn:active { transform: scale(0.98); }
-
-        /* HEADER BAR */
-        .header-bar {
-            display: flex; align-items: center; justify-content: space-between;
-            margin-bottom: 15px; position: relative; width: 100%;
-        }
-        
-        .btn-back-round {
-            width: 40px; height: 40px; border-radius: 50%;
-            background: var(--primary); color: white;
-            border: none; display: flex; align-items: center; justify-content: center;
-            font-size: 20px; box-shadow: 0 3px 10px rgba(0,0,0,0.15);
-            cursor: pointer; z-index: 50; flex-shrink: 0;
-        }
-        
-        .header-title {
-            position: absolute; left: 0; right: 0; text-align: center;
-            margin: 0; pointer-events: none; z-index: 1;
-        }
-
-        /* Inputs */
-        label { font-weight: 700; font-size: 14px; color: #444; margin-bottom: 5px; display: block; }
-        input { 
-            width: 100%; padding: 14px; margin-bottom: 15px; border: 2px solid #eee; 
-            border-radius: 10px; outline: none; font-family: 'UTM Avo', sans-serif; font-size: 15px;
-        }
-        input:focus { border-color: var(--secondary); background: #fdfdfd; }
-        input::placeholder { color: #bbb; font-style: italic; font-size: 13px; }
-
-        /* Gender Select */
-        .gender-group { display: flex; gap: 15px; margin-bottom: 15px; }
-        .gender-btn {
-            flex: 1; padding: 12px; border: 1px solid #eee; border-radius: 10px;
-            text-align: center; cursor: pointer; font-weight: 700; color: #666;
-            transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px;
-        }
-        .gender-btn.selected { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 4px 10px rgba(78, 84, 200, 0.2); }
-
-        /* --- HOME SCREEN --- */
-        #screen-home { justify-content: center; align-items: center; }
-        .home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; }
-        .btn-square {
-            aspect-ratio: 1/1; border: none; border-radius: 25px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            font-family: 'UTM Avo', sans-serif; font-weight: 700; font-size: 16px;
-            cursor: pointer; color: white; box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-            transition: transform 0.1s;
-        }
-        .btn-square span { font-size: 32px; margin-bottom: 10px; }
-        .bg-blue { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-        .bg-purple { background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%); }
-
-        /* --- LIBRARY SCREEN --- */
-        .lib-grid { 
-            display: grid; grid-template-columns: 1fr 1fr; gap: 15px; 
-            padding-bottom: 20px; 
-        }
-        .lib-card { 
-            background: white; border-radius: 12px; overflow: hidden; position: relative;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.08); cursor: pointer; 
-            transition: transform 0.2s; border: 1px solid #f0f0f0;
-        }
-        .lib-card:active { transform: scale(0.95); }
-        .lib-card img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; }
-        
-        .holland-badge {
-            position: absolute; top: 8px; left: 8px; width: 28px; height: 28px; background: white;
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-weight: 700; font-size: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 5;
-        }
-        .lib-info { padding: 10px; text-align: center; }
-        .lib-name-vn { font-weight: 700; font-size: 14px; color: #333; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .lib-name-en { font-weight: 400; font-size: 11px; color: #888; font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-        /* --- INPUT SCREEN BOTTOM ACTION --- */
-        .input-actions {
-            display: flex; gap: 10px; margin-top: auto; width: 100%;
-        }
-        .btn-back-rect {
-            flex: 0.4; background: white; border: 2px solid #ddd; color: #666;
-        }
-
-        /* --- SWIPE SCREEN --- */
-        #video-section {
-            width: 100%; aspect-ratio: 16/9; background: #000; 
-            margin-bottom: 10px; border-radius: 12px; overflow: hidden;
-            display: none; animation: slideDown 0.3s;
-        }
-        @keyframes slideDown { from { height: 0; } to { height: auto; } }
-        iframe { width: 100%; height: 100%; border: none; }
-
-        #card-zone { 
-            position: relative; flex-grow: 1; margin: 5px 0 10px 0; 
-            perspective: 1000px; 
-            min-height: 250px; 
-        }
-        
-        .tinder-card {
-            position: absolute; width: 100%; height: 100%; 
-            transform-style: preserve-3d; transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-            border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); cursor: pointer;
-            background: white;
-        }
-        .card-face {
-            position: absolute; width: 100%; height: 100%;
-            backface-visibility: hidden; border-radius: 20px; overflow: hidden; background: white;
-        }
-        .card-front { z-index: 2; transform: rotateY(0deg); }
-        .card-front img { width: 100%; height: 100%; object-fit: cover; }
-        .card-overlay {
-            position: absolute; bottom: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 40%, rgba(0,0,0,0) 100%);
-            display: flex; flex-direction: column; justify-content: flex-end; padding: 20px; text-align: center;
-        }
-        .card-title-vn { color: white; font-size: 26px; margin: 0; line-height: 1.2; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-        .card-title-en { color: #ccc; font-size: 15px; font-style: italic; margin-top: 5px; font-weight: 400; }
-
-        .card-back { transform: rotateY(180deg); background: #fff; display: flex; flex-direction: column; }
-        .back-header { background: #f8f9fa; padding: 15px; text-align: center; border-bottom: 1px solid #eee; }
-        .back-content { padding: 20px; overflow-y: auto; text-align: left; font-size: 14px; line-height: 1.6; color: #444; }
-        .tinder-card.is-flipped { transform: rotateY(180deg); }
-
-        .timer-bar-container { width: 100%; height: 6px; background: #eee; border-radius: 3px; margin-top: 5px; }
-        .timer-bar { height: 100%; background: var(--danger); width: 100%; transition: width 1s linear; }
-
-        .control-bar { display: flex; justify-content: center; gap: 20px; padding: 10px 0; align-items: center; }
-        .action-btn {
-            width: 60px; height: 60px; border-radius: 50%; border: none;
-            font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1); transition: transform 0.1s;
-        }
-        .action-btn:active { transform: scale(0.9); }
-        .btn-dislike { background: var(--danger); color: white; }
-        .btn-neutral { background: var(--neutral); color: white; font-size: 30px; }
-        .btn-like { background: var(--success); color: white; }
-
-        /* --- RESULT SCREEN --- */
-        .result-card {
-            background: white; border: 1px solid #eee; border-radius: 15px;
-            padding: 20px; margin-bottom: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.03);
-        }
-        .res-label { font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; font-weight: 700; }
-        .res-value { font-size: 16px; color: #333; font-weight: 400; }
-        
-        /* HOLLAND DISPLAY */
-        .holland-display { font-size: 36px; font-weight: 700; letter-spacing: 2px; margin: 10px 0; }
-        .h-char { display: inline-block; }
-        .h-desc { font-size: 14px; margin-top: 5px; line-height: 1.5; color: #555; display: block; }
-
-        /* --- MODAL --- */
-        #modal-info, #modal-classification { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.85); z-index: 200; display: none; 
-            justify-content: center; align-items: center; perspective: 1000px;
-        }
-        .modal-card { 
-            background: white; width: 90%; max-height: 85vh; border-radius: 20px; 
-            overflow-y: auto; position: relative; display: flex; flex-direction: column;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            transform: scale(0.8) translateY(50px); opacity: 0;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .modal-card.zoom-in { transform: scale(1) translateY(0); opacity: 1; }
-        .modal-header { padding: 20px; background: #f8f9fa; border-bottom: 1px solid #eee; text-align: center; }
-        .modal-body { padding: 20px; font-size: 14px; line-height: 1.6; color: #444; }
-        .modal-close { position: absolute; top: 15px; right: 15px; font-size: 28px; color: #999; cursor: pointer; z-index: 10; font-weight: bold; }
-        .class-col { margin-bottom: 15px; }
-        .class-head { font-weight: 700; margin-bottom: 5px; display: block; }
-        .class-list-item { font-size: 13px; padding: 5px 0; border-bottom: 1px dashed #eee; }
-
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Hộ Chiếu Tương Lai - VSCC</title>
+  <link rel="stylesheet" href="src/styles.css">
 </head>
+
 <body>
 
-<div class="app-container">
-    
+  <div class="app-container">
+
     <div class="main-content">
-        
-        <div id="screen-home" class="screen active">
-            <div style="text-align: center;">
-                <img src="https://github.com/minhlh042-byte/web-huong-nghiep/blob/main/Asset%2020@4x-8.png?raw=true" class="logo-img">
-                <h2 style="font-size: 24px; margin-bottom: 5px; color: #333;">Hộ Chiếu Tương Lai</h2>
-                <h3 style="font-size: 16px; color: var(--primary); margin-top: 0;">Vietnam STEM Career Card</h3>
-            </div>
-            
-            <p style="text-align: center; color: #666; font-size: 15px; margin-bottom: 30px; padding: 0 10px;">
-                Khám phá bản thân, định hướng tương lai cùng công nghệ AI tiên tiến.
-            </p>
 
-            <div class="home-grid">
-                <button class="btn-square bg-blue" onclick="goToScreen('screen-library')">
-                    <span>🔍</span> <br>THƯ VIỆN NGHỀ
-                </button>
-                <button class="btn-square bg-purple" onclick="goToScreen('screen-input')">
-                    <span>🔮</span> <br>KHÁM PHÁ (AI)
-                </button>
-            </div>
+      <div id="screen-home" class="screen active">
+        <div style="text-align: center;">
+          <img src="https://github.com/minhlh042-byte/web-huong-nghiep/blob/main/Asset%2020@4x-8.png?raw=true"
+            class="logo-img">
+          <h2 style="font-size: 24px; margin-bottom: 5px; color: #333;">Hộ Chiếu Tương Lai</h2>
+          <h3 style="font-size: 16px; color: var(--primary); margin-top: 0;">Vietnam STEM Career Card</h3>
         </div>
 
-        <div id="screen-library" class="screen">
-            <div class="header-bar">
-                <button onclick="goToScreen('screen-home')" class="btn-back-round">←</button>
-                <h3 class="header-title">Thư Viện Nghề</h3>
-                <div style="width: 40px;"></div>
-            </div>
-            
-            <input type="text" id="search-lib" placeholder="Ví dụ: Kỹ sư phần mềm..." onkeyup="filterLib()">
-            
-            <div id="lib-container" class="lib-grid"></div>
+        <p style="text-align: center; color: #666; font-size: 15px; margin-bottom: 30px; padding: 0 10px;">
+          Khám phá bản thân, định hướng tương lai cùng công nghệ AI tiên tiến.
+        </p>
+
+        <div class="home-grid">
+          <button class="btn-square bg-blue" onclick="goToScreen('screen-library')">
+            <span>🔍</span> <br>THƯ VIỆN NGHỀ
+          </button>
+          <button class="btn-square bg-purple" onclick="goToScreen('screen-input')">
+            <span>🔮</span> <br>KHÁM PHÁ (AI)
+          </button>
+        </div>
+      </div>
+
+      <div id="screen-library" class="screen">
+        <div class="header-bar">
+          <button onclick="goToScreen('screen-home')" class="btn-back-round">←</button>
+          <h3 class="header-title">Thư Viện Nghề</h3>
+          <div style="width: 40px;"></div>
         </div>
 
-        <div id="screen-input" class="screen">
-            <div style="text-align: center; margin-bottom: 20px; margin-top: 10px;">
-                <img src="https://github.com/minhlh042-byte/web-huong-nghiep/blob/main/Asset%2020@4x-8.png?raw=true" class="logo-img" style="width: 120px;">
-                <div style="font-weight: 800; color: var(--primary); font-size: 14px; margin-bottom: 5px;">PHÂN TÍCH HỘ CHIẾU CÔNG DÂN</div>
-                <h3>Thông tin Công dân tương lai</h3>
-                <p style="font-size: 13px; color: #666; font-style: italic; margin-top: 10px;">
-                    Chào mừng bạn đến với hành trình kiến tạo tương lai! Hãy nhập thông tin để AI giúp bạn tìm ra "tọa độ" nghề nghiệp chính xác nhất nhé.
-                </p>
-            </div>
-            
-            <label>Họ và tên</label> <input type="text" id="inp-name" placeholder="VD: Nguyễn Văn A">
-            
-            <div style="display:flex; gap:10px">
-                <div style="flex:1"><label>Năm sinh</label> <input type="number" id="inp-yob" placeholder="VD: 2008"></div>
-                <div style="flex:1"><label>Lớp</label> <input type="text" id="inp-class" placeholder="VD: 9A1"></div>
-            </div>
+        <input type="text" id="search-lib" placeholder="Ví dụ: Kỹ sư phần mềm..." onkeyup="filterLib()">
 
-            <label>Giới tính</label>
-            <div class="gender-group">
-                <div class="gender-btn selected" id="gender-male" onclick="selectGender('Nam')">♂ Nam</div>
-                <div class="gender-btn" id="gender-female" onclick="selectGender('Nữ')">♀ Nữ</div>
-            </div>
-            
-            <label>Email (Để nhận kết quả chi tiết)</label> <input type="email" id="inp-email" placeholder="VD: email@example.com">
-            
-            <div style="flex-grow: 1;"></div>
-            
-            <div class="input-actions">
-                <button class="btn btn-back-rect" onclick="goToScreen('screen-home')">← Trở về</button>
-                <button class="btn btn-primary" onclick="startQuiz()" style="flex: 1;">BẮT ĐẦU PHÂN LOẠI ➔</button>
-            </div>
+        <div id="lib-container" class="lib-grid"></div>
+      </div>
+
+      <div id="screen-input" class="screen">
+        <div style="text-align: center; margin-bottom: 20px; margin-top: 10px;">
+          <img src="https://github.com/minhlh042-byte/web-huong-nghiep/blob/main/Asset%2020@4x-8.png?raw=true"
+            class="logo-img" style="width: 120px;">
+          <div style="font-weight: 800; color: var(--primary); font-size: 14px; margin-bottom: 5px;">PHÂN TÍCH
+            HỘ CHIẾU CÔNG DÂN</div>
+          <h3>Thông tin Công dân tương lai</h3>
+          <p style="font-size: 13px; color: #666; font-style: italic; margin-top: 10px;">
+            Chào mừng bạn đến với hành trình kiến tạo tương lai! Hãy nhập thông tin để AI giúp bạn tìm ra
+            "tọa độ" nghề nghiệp chính xác nhất nhé.
+          </p>
         </div>
 
-        <div id="screen-swipe" class="screen">
-            <div class="header-bar">
-                <button onclick="quitQuiz()" class="btn-back-round">✕</button>
-                <img src="https://github.com/minhlh042-byte/web-huong-nghiep/blob/main/Asset%2020@4x-8.png?raw=true" style="height: 60px; object-fit: contain; position:absolute; left:0; right:0; margin:auto;">
-                <div style="width: 40px;"></div>
-            </div>
+        <label>Họ và tên</label> <input type="text" id="inp-name" placeholder="VD: Nguyễn Văn A">
 
-            <div style="text-align:center; margin-bottom:5px;">
-                <small style="color:#999; font-weight:700">Thẻ: <span id="progress-count">0/0</span></small>
-            </div>
-            
-            <div id="video-section">
-                <iframe id="video-frame" src="" allowfullscreen></iframe>
-            </div>
-
-            <div id="card-zone"></div>
-            
-            <div class="timer-bar-container"><div id="timer-bar" class="timer-bar"></div></div>
-
-            <div class="control-bar">
-                <button class="action-btn btn-dislike" onclick="userSwipe('left')">✕</button>
-                <button class="action-btn btn-neutral" onclick="userSwipe('up')">🙂</button>
-                <button class="action-btn btn-like" onclick="userSwipe('right')">❤</button>
-            </div>
-            <p style="text-align:center; font-size:11px; color:#aaa; margin-top:-5px">Chạm vào thẻ để xem chi tiết & Video</p>
+        <div style="display:flex; gap:10px">
+          <div style="flex:1"><label>Năm sinh</label> <input type="number" id="inp-yob" placeholder="VD: 2008"></div>
+          <div style="flex:1"><label>Lớp</label> <input type="text" id="inp-class" placeholder="VD: 9A1">
+          </div>
         </div>
 
-        <div id="screen-result" class="screen">
-            <div style="text-align: center; margin-bottom: 20px;">
-                <img src="https://github.com/minhlh042-byte/web-huong-nghiep/blob/main/Asset%2020@4x-8.png?raw=true" class="logo-img" style="width: 80px;">
-                <h3>Kết Quả Phân Tích</h3>
-            </div>
-
-            <div class="result-card">
-                <div class="res-label">Hồ sơ cá nhân</div>
-                <div class="res-value"><b id="res-name">Tên</b> - <span id="res-class">Lớp</span> (<span id="res-gender"></span>)</div>
-                <div class="res-value" style="font-size: 14px; color: #666; margin-top: 5px;" id="res-email">email</div>
-            </div>
-
-            <div id="ai-result-container">
-                <div style="text-align:center; padding: 40px; color: #666;">
-                    <div style="display:inline-block; width: 20px; height: 20px; border: 3px solid #ccc; border-top-color: var(--primary); border-radius: 50%; animation: spin 1s infinite;"></div>
-                    <p>AI đang tổng hợp dữ liệu...</p>
-                </div>
-            </div>
-
-            <button class="btn btn-outline" onclick="showClassification()">Xem lại kết quả phân loại</button>
-            <button class="btn btn-secondary" id="btn-mail" onclick="sendEmail()">📧 Nhận kết quả qua Email</button>
-            <button class="btn btn-primary" onclick="restartApp()">Làm lại từ đầu</button>
+        <label>Giới tính</label>
+        <div class="gender-group">
+          <div class="gender-btn selected" id="gender-male" onclick="selectGender('Nam')">♂ Nam</div>
+          <div class="gender-btn" id="gender-female" onclick="selectGender('Nữ')">♀ Nữ</div>
         </div>
+
+        <label>Email (Để nhận kết quả chi tiết)</label> <input type="email" id="inp-email"
+          placeholder="VD: email@example.com">
+
+        <div style="flex-grow: 1;"></div>
+
+        <div class="input-actions">
+          <button class="btn btn-back-rect" onclick="goToScreen('screen-home')">← Trở về</button>
+          <button class="btn btn-primary" onclick="startQuiz()" style="flex: 1;">BẮT ĐẦU PHÂN LOẠI ➔</button>
+        </div>
+      </div>
+
+      <div id="screen-swipe" class="screen">
+        <div class="header-bar">
+          <button onclick="quitQuiz()" class="btn-back-round">✕</button>
+          <img src="https://github.com/minhlh042-byte/web-huong-nghiep/blob/main/Asset%2020@4x-8.png?raw=true"
+            style="height: 60px; object-fit: contain; position:absolute; left:0; right:0; margin:auto;">
+          <div style="width: 40px;"></div>
+        </div>
+
+        <div style="text-align:center; margin-bottom:5px;">
+          <small style="color:#999; font-weight:700">Thẻ: <span id="progress-count">0/0</span></small>
+        </div>
+
+        <div id="video-section">
+          <iframe id="video-frame" src="" allowfullscreen></iframe>
+        </div>
+
+        <div id="card-zone"></div>
+
+        <div class="timer-bar-container">
+          <div id="timer-bar" class="timer-bar"></div>
+        </div>
+
+        <div class="control-bar">
+          <button class="action-btn btn-dislike" onclick="userSwipe('left')">✕</button>
+          <button class="action-btn btn-neutral" onclick="userSwipe('up')">🙂</button>
+          <button class="action-btn btn-like" onclick="userSwipe('right')">❤</button>
+        </div>
+        <p style="text-align:center; font-size:11px; color:#aaa; margin-top:-5px">Chạm vào thẻ để xem chi tiết &
+          Video</p>
+      </div>
+
+      <div id="screen-result" class="screen">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <img src="https://github.com/minhlh042-byte/web-huong-nghiep/blob/main/Asset%2020@4x-8.png?raw=true"
+            class="logo-img" style="width: 80px;">
+          <h3>Kết Quả Phân Tích</h3>
+        </div>
+
+        <div class="result-card">
+          <div class="res-label">Hồ sơ cá nhân</div>
+          <div class="res-value"><b id="res-name">Tên</b> - <span id="res-class">Lớp</span> (<span
+              id="res-gender"></span>)</div>
+          <div class="res-value" style="font-size: 14px; color: #666; margin-top: 5px;" id="res-email">email
+          </div>
+        </div>
+
+        <div id="ai-result-container">
+          <div style="text-align:center; padding: 40px; color: #666;">
+            <div
+              style="display:inline-block; width: 20px; height: 20px; border: 3px solid #ccc; border-top-color: var(--primary); border-radius: 50%; animation: spin 1s infinite;">
+            </div>
+            <p>AI đang tổng hợp dữ liệu...</p>
+          </div>
+        </div>
+
+        <button class="btn btn-outline" onclick="showClassification()">Xem lại kết quả phân loại</button>
+        <button class="btn btn-secondary" id="btn-mail" onclick="sendEmail()">📧 Nhận kết quả qua Email</button>
+        <button class="btn btn-primary" onclick="restartApp()">Làm lại từ đầu</button>
+      </div>
 
     </div>
 
     <div class="app-footer">
-        <h4 class="ft-main">Vietnam STEM Career Learning Card (VSCC)</h4>
-        <p class="ft-sub">Dự án "Thẻ học tập nghề nghiệp STEM"</p>
-        <p class="ft-author">BSc. Le Hoang Minh ft. MSc. Duong Thi Yen</p>
-        <p class="ft-aff">Faculty of Interdisciplinary Science @VNUHCM - University Of Science</p>
+      <h4 class="ft-main">Vietnam STEM Career Learning Card (VSCC)</h4>
+      <p class="ft-sub">Dự án "Thẻ học tập nghề nghiệp STEM"</p>
+      <p class="ft-author">BSc. Le Hoang Minh ft. MSc. Duong Thi Yen</p>
+      <p class="ft-aff">Faculty of Interdisciplinary Science @VNUHCM - University Of Science</p>
     </div>
 
-</div>
+  </div>
 
-<div id="modal-info">
+  <div id="modal-info">
     <div class="modal-card" id="lib-modal-card">
-        <span class="modal-close" onclick="closeModal()">×</span>
-        <div class="modal-header">
-            <h3 id="m-title-vn" style="margin:0; font-size: 20px;">Tên Nghề</h3>
-            <i id="m-title-en" style="color:#666; font-size: 14px;">Job Name</i>
-            <div id="m-group" style="margin-top:5px; font-weight:700"></div>
+      <span class="modal-close" onclick="closeModal()">×</span>
+      <div class="modal-header">
+        <h3 id="m-title-vn" style="margin:0; font-size: 20px;">Tên Nghề</h3>
+        <i id="m-title-en" style="color:#666; font-size: 14px;">Job Name</i>
+        <div id="m-group" style="margin-top:5px; font-weight:700"></div>
+      </div>
+      <div class="modal-body">
+        <p><b>Mô tả:</b> <span id="m-desc"></span></p>
+        <p><b>Môn học:</b> <span id="m-subjects"></span></p>
+        <p><b>Phẩm chất:</b> <span id="m-qualities"></span></p>
+        <div style="background: #fff3cd; padding: 10px; border-radius: 8px; margin-top: 15px; font-size: 13px;">
+          💡 <b>Thú vị:</b> <span id="m-fact"></span>
         </div>
-        <div class="modal-body">
-            <p><b>Mô tả:</b> <span id="m-desc"></span></p>
-            <p><b>Môn học:</b> <span id="m-subjects"></span></p>
-            <p><b>Phẩm chất:</b> <span id="m-qualities"></span></p>
-            <div style="background: #fff3cd; padding: 10px; border-radius: 8px; margin-top: 15px; font-size: 13px;">
-                💡 <b>Thú vị:</b> <span id="m-fact"></span>
-            </div>
-            <hr style="border:0; border-top:1px dashed #eee; margin: 20px 0;">
-            <div style="font-weight: 700; font-size: 13px; color:#555; margin-bottom:5px">HÌNH ẢNH & VIDEO MINH HỌA</div>
-            <div id="m-media-container" style="width:100%; aspect-ratio:4/3; background:#f0f0f0; border-radius:10px; overflow:hidden;"></div>
+        <hr style="border:0; border-top:1px dashed #eee; margin: 20px 0;">
+        <div style="font-weight: 700; font-size: 13px; color:#555; margin-bottom:5px">HÌNH ẢNH & VIDEO MINH HỌA
         </div>
+        <div id="m-media-container"
+          style="width:100%; aspect-ratio:4/3; background:#f0f0f0; border-radius:10px; overflow:hidden;">
+        </div>
+      </div>
     </div>
-</div>
+  </div>
 
-<div id="modal-classification">
+  <div id="modal-classification">
     <div class="modal-card" id="class-modal-card">
-        <span class="modal-close" onclick="closeModalClass()">×</span>
-        <div class="modal-header"><h3>Kết Quả Phân Loại</h3></div>
-        <div class="modal-body">
-            <div class="class-col">
-                <span class="class-head" style="color:var(--success)">❤ THÍCH (Vuốt Phải)</span>
-                <div id="list-liked"></div>
-            </div>
-            <div class="class-col">
-                <span class="class-head" style="color:var(--neutral)">🙂 BÌNH THƯỜNG (Vuốt Lên)</span>
-                <div id="list-neutral"></div>
-            </div>
-            <div class="class-col">
-                <span class="class-head" style="color:var(--danger)">✕ KHÔNG THÍCH (Vuốt Trái)</span>
-                <div id="list-disliked"></div>
-            </div>
+      <span class="modal-close" onclick="closeModalClass()">×</span>
+      <div class="modal-header">
+        <h3>Kết Quả Phân Loại</h3>
+      </div>
+      <div class="modal-body">
+        <div class="class-col">
+          <span class="class-head" style="color:var(--success)">❤ THÍCH (Vuốt Phải)</span>
+          <div id="list-liked"></div>
         </div>
+        <div class="class-col">
+          <span class="class-head" style="color:var(--neutral)">🙂 BÌNH THƯỜNG (Vuốt Lên)</span>
+          <div id="list-neutral"></div>
+        </div>
+        <div class="class-col">
+          <span class="class-head" style="color:var(--danger)">✕ KHÔNG THÍCH (Vuốt Trái)</span>
+          <div id="list-disliked"></div>
+        </div>
+      </div>
     </div>
-</div>
+  </div>
 
-<script>
-    const CONFIG = {
-        SHEET_CSV: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTn_AISCPAvNtkZZcjcMn4_80wXuarbci9SyqBqDnnHpB5WM1QShft3xU7HHxgIP_AKz9ffyoEsAd9D/pub?output=csv"
-    };
+  <script src="src/code.js"></script>
 
-    const HOLLAND_MAP = {
-        'R': { color: 'var(--color-R)', vn: 'Thực tế', en: 'Realistic' },
-        'I': { color: 'var(--color-I)', vn: 'Nghiên cứu', en: 'Investigative' },
-        'A': { color: 'var(--color-A)', vn: 'Nghệ thuật', en: 'Artistic' },
-        'S': { color: 'var(--color-S)', vn: 'Xã hội', en: 'Social' },
-        'E': { color: 'var(--color-E)', vn: 'Quản lý', en: 'Enterprising' },
-        'C': { color: 'var(--color-C)', vn: 'Nghiệp vụ', en: 'Conventional' }
-    };
-
-    let rawData = [], mainQueue = [], retryQueue = [], user = { gender:'Nam', liked: [], disliked: [], neutral: [], scores: {} };
-    let currentItem = null, timerInterval = null, aiResultText = "";
-
-    window.onload = async () => {
-        try {
-            const res = await fetch(CONFIG.SHEET_CSV);
-            rawData = parseCSV(await res.text());
-            const libraryData = rawData.slice().sort(() => 0.5 - Math.random());
-            renderLibrary(libraryData);
-        } catch(e) { console.error(e); }
-    };
-
-    function parseCSV(text) {
-        const lines = text.trim().split('\n'), res = [];
-        for(let i=1; i<lines.length; i++) {
-            const row = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-            if(row.length < 2) continue;
-            const c = t => t ? t.replace(/^"|"$/g, '').trim() : "";
-            res.push({
-                id: c(row[0]), nameVN: c(row[1]), nameEN: c(row[2]), group: c(row[3]),
-                img1: c(row[4]), img2: c(row[5]), desc: c(row[6]), subjects: c(row[7]),
-                qualities: c(row[8]), fact: c(row[9]), video: c(row[10]) || "" 
-            });
-        }
-        return res;
-    }
-
-    /* --- UPDATED: HOLLAND RENDER WITH FULL NAMES --- */
-    function renderHollandFancy(codeStr) {
-        let html = '<div class="holland-display">';
-        let descParts = [];
-        
-        for (let char of codeStr) {
-            let info = HOLLAND_MAP[char];
-            if(!info) continue;
-            
-            // Letters
-            html += `<span class="h-char" style="color:${info.color}">${char}</span>`;
-            
-            // Full description lines
-            descParts.push(`<span style="color:${info.color}; display:block;">${char} (${info.en} - ${info.vn})</span>`);
-        }
-        html += '</div>';
-        
-        // Show detailed description below
-        if(descParts.length > 0) {
-            html += `<div class="h-desc" style="text-align:center; font-weight:700; margin-top:5px;">${descParts.join('')}</div>`;
-        }
-        return html;
-    }
-
-    /* --- GENDER SELECT --- */
-    function selectGender(g) {
-        user.gender = g;
-        document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('selected'));
-        if(g === 'Nam') document.getElementById('gender-male').classList.add('selected');
-        else document.getElementById('gender-female').classList.add('selected');
-    }
-
-    /* --- LIBRARY --- */
-    function renderLibrary(list) {
-        document.getElementById('lib-container').innerHTML = list.map(i => {
-            const code = i.group.charAt(0).toUpperCase();
-            const color = HOLLAND_MAP[code] ? HOLLAND_MAP[code].color : 'var(--primary)';
-            return `
-            <div class="lib-card" onclick="showLibModal('${i.id}')">
-                <div class="holland-badge" style="color: ${color}">${code}</div>
-                <img src="${i.img2}" loading="lazy">
-                <div class="lib-info">
-                    <span class="lib-name-vn">${i.nameVN}</span>
-                    <span class="lib-name-en">${i.nameEN}</span>
-                </div>
-            </div>`;
-        }).join('');
-    }
-
-    function showLibModal(id) {
-        const item = rawData.find(x => x.id === id);
-        if(!item) return;
-        
-        document.getElementById('m-title-vn').innerText = item.nameVN;
-        document.getElementById('m-title-en').innerText = item.nameEN;
-        document.getElementById('m-desc').innerText = item.desc;
-        document.getElementById('m-subjects').innerText = item.subjects;
-        document.getElementById('m-qualities').innerText = item.qualities;
-        document.getElementById('m-fact').innerText = item.fact;
-        
-        // Use Updated Render Function
-        document.getElementById('m-group').innerHTML = renderHollandFancy(item.group);
-
-        const mediaCon = document.getElementById('m-media-container');
-        if(item.video) {
-             const vidUrl = item.video.replace("watch?v=", "embed/");
-             mediaCon.innerHTML = `<iframe src="${vidUrl}" style="width:100%; height:100%; border:none"></iframe>`;
-        } else {
-             mediaCon.innerHTML = `<img src="${item.img2}" style="width:100%; height:100%; object-fit:cover">`;
-        }
-        
-        document.getElementById('modal-info').style.display = 'flex';
-        setTimeout(() => document.getElementById('lib-modal-card').classList.add('zoom-in'), 10);
-    }
-    
-    function closeModal() {
-        document.getElementById('lib-modal-card').classList.remove('zoom-in');
-        setTimeout(() => {
-            document.getElementById('modal-info').style.display = 'none';
-            document.getElementById('m-media-container').innerHTML = "";
-        }, 300);
-    }
-    
-    function closeModalClass() {
-        document.getElementById('class-modal-card').classList.remove('zoom-in');
-        setTimeout(() => {
-            document.getElementById('modal-classification').style.display = 'none';
-        }, 300);
-    }
-    
-    function filterLib() {
-        const k = document.getElementById('search-lib').value.toLowerCase();
-        renderLibrary(rawData.filter(i => i.nameVN.toLowerCase().includes(k)));
-    }
-
-    /* --- QUIZ --- */
-    function goToScreen(id) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-    }
-
-    function startQuiz() {
-        const name = document.getElementById('inp-name').value;
-        const yob = document.getElementById('inp-yob').value;
-        if(!name || !yob) return alert("Vui lòng nhập Tên và Năm sinh!");
-        
-        user.name = name;
-        user.yob = yob;
-        user.class = document.getElementById('inp-class').value;
-        user.email = document.getElementById('inp-email').value;
-        user.liked = []; user.disliked = []; user.neutral = []; user.scores = {};
-        
-        mainQueue = rawData.slice().sort(()=>0.5-Math.random()).slice(0, 20);
-        retryQueue = [];
-        
-        goToScreen('screen-swipe');
-        loadNextCard();
-    }
-
-    function loadNextCard() {
-        if(mainQueue.length === 0) {
-            if(retryQueue.length > 0) { mainQueue = retryQueue; retryQueue = []; }
-            else return finishAndAnalyze();
-        }
-        currentItem = mainQueue.shift();
-        renderCard(currentItem);
-        startTimer();
-    }
-
-    function renderCard(item) {
-        document.getElementById('video-section').style.display = 'none';
-        document.getElementById('video-frame').src = "";
-        
-        const html = `
-        <div class="tinder-card" id="active-card" onclick="flipCard()">
-            <div class="card-face card-front">
-                <img src="${item.img2}" draggable="false">
-                <div class="card-overlay">
-                    <h2 class="card-title-vn">${item.nameVN}</h2>
-                    <p class="card-title-en">${item.nameEN}</p>
-                </div>
-            </div>
-            <div class="card-face card-back">
-                <div class="back-header">
-                    <h3 style="margin:0">${item.nameVN}</h3>
-                    ${renderHollandFancy(item.group)}
-                </div>
-                <div class="back-content">
-                    <p><b>Mô tả:</b> ${item.desc}</p>
-                    <p><b>Môn học:</b> ${item.subjects}</p>
-                    <p><b>Thú vị:</b> ${item.fact}</p>
-                </div>
-            </div>
-        </div>`;
-        document.getElementById('card-zone').innerHTML = html;
-        document.getElementById('progress-count').innerText = (mainQueue.length + retryQueue.length + 1);
-    }
-
-    function flipCard() {
-        const card = document.getElementById('active-card');
-        card.classList.toggle('is-flipped');
-        const vidSec = document.getElementById('video-section');
-        
-        if(card.classList.contains('is-flipped')) {
-            vidSec.style.display = 'block';
-            const vidUrl = currentItem.video ? (currentItem.video.replace("watch?v=", "embed/")) : `https://www.youtube.com/embed?listType=search&list=nghề ${currentItem.nameVN}`;
-            document.getElementById('video-frame').src = vidUrl;
-        } else {
-            vidSec.style.display = 'none';
-            document.getElementById('video-frame').src = "";
-        }
-    }
-
-    function startTimer() {
-        clearInterval(timerInterval);
-        const bar = document.getElementById('timer-bar');
-        bar.style.transition = 'none'; bar.style.width = '100%';
-        setTimeout(() => { bar.style.transition = 'width 5s linear'; bar.style.width = '0%'; }, 10);
-        timerInterval = setTimeout(() => { userSwipe('down'); }, 5000);
-    }
-
-    function userSwipe(dir) {
-        clearInterval(timerInterval);
-        const card = document.getElementById('active-card');
-        if(!card) return;
-
-        card.style.transition = 'transform 0.5s ease-out, opacity 0.5s';
-        let tr = '';
-        if(dir === 'left') tr = 'translateX(-150%) rotate(-30deg)';
-        if(dir === 'right') tr = 'translateX(150%) rotate(30deg)';
-        if(dir === 'up') tr = 'translateY(-150%)';
-        if(dir === 'down') tr = 'translateY(150%)';
-
-        card.style.transform = tr; card.style.opacity = '0';
-
-        if(dir === 'right') {
-            user.liked.push(currentItem);
-            const g = currentItem.group.charAt(0);
-            user.scores[g] = (user.scores[g] || 0) + 1;
-        } else if (dir === 'left') user.disliked.push(currentItem);
-        else if (dir === 'up') user.neutral.push(currentItem);
-        else if (dir === 'down') retryQueue.push(currentItem);
-        
-        setTimeout(loadNextCard, 400);
-    }
-
-    /* --- RESULT --- */
-    function finishAndAnalyze() {
-        goToScreen('screen-result');
-        document.getElementById('res-name').innerText = user.name;
-        document.getElementById('res-class').innerText = user.class || "?";
-        document.getElementById('res-email').innerText = user.email || "";
-        document.getElementById('res-gender').innerText = user.gender;
-
-        const sorted = Object.entries(user.scores).sort((a,b) => b[1] - a[1]);
-        let topHolland = "";
-        if(sorted.length > 0) topHolland += sorted[0][0];
-        if(sorted.length > 1) topHolland += sorted[1][0];
-
-        const prompt = `
-            Học sinh: ${user.name}, Giới tính: ${user.gender}, Lớp: ${user.class}, Năm sinh: ${user.yob}.
-            Kết quả Holland: ${topHolland}.
-            Thích: ${user.liked.map(i=>i.nameVN).join(', ')}.
-            Viết báo cáo HTML (body only) gồm: 1. Sở thích. 2. Tính cách. 3. Mã Holland.
-        `;
-        
-        if (typeof google !== 'undefined') {
-             google.script.run
-            .withSuccessHandler(res => { 
-                if(res.status === 'success') {
-                    document.getElementById('ai-result-container').innerHTML = res.text;
-                    aiResultText = res.text;
-                } else document.getElementById('ai-result-container').innerHTML = "Lỗi: " + res.message;
-            })
-            .callGeminiAI(prompt);
-        } else {
-            document.getElementById('ai-result-container').innerHTML = "<p>Demo: Kết nối Google Script để xem AI phân tích.</p>";
-        }
-    }
-
-    function showClassification() {
-        document.getElementById('list-liked').innerHTML = user.liked.map(i=>`<div class='class-list-item'>${i.nameVN}</div>`).join('') || "<i>Trống</i>";
-        document.getElementById('list-neutral').innerHTML = user.neutral.map(i=>`<div class='class-list-item'>${i.nameVN}</div>`).join('') || "<i>Trống</i>";
-        document.getElementById('list-disliked').innerHTML = user.disliked.map(i=>`<div class='class-list-item'>${i.nameVN}</div>`).join('') || "<i>Trống</i>";
-        
-        document.getElementById('modal-classification').style.display = 'flex';
-        setTimeout(() => document.getElementById('class-modal-card').classList.add('zoom-in'), 10);
-    }
-
-    function sendEmail() {
-        if(!user.email) return alert("Bạn chưa nhập Email!");
-        const btn = document.getElementById('btn-mail');
-        btn.innerText = "Đang gửi...";
-        
-        if (typeof google !== 'undefined') {
-            google.script.run
-            .withSuccessHandler(res => { 
-                if(res.status === 'success') { alert("Đã gửi email!"); btn.innerText = "Đã gửi xong"; }
-                else { alert("Lỗi: " + res.message); btn.innerText = "Gửi lại"; }
-            })
-            .sendEmailReport({
-                name: user.name,
-                email: user.email,
-                result: aiResultText || "Chưa có kết quả AI"
-            });
-        }
-    }
-
-    function restartApp() {
-        if(confirm("Làm lại từ đầu?")) {
-            user = { liked: [], disliked: [], neutral: [], scores: {}, gender: user.gender };
-            goToScreen('screen-input');
-        }
-    }
-    function quitQuiz() { if(confirm("Thoát?")) goToScreen('screen-home'); }
-
-</script>
-<style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
 </body>
+
 </html>
