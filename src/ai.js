@@ -48,12 +48,12 @@ async function callGeminiAI(prompt) {
 export async function testGeminiAI() {
   const prompt = `
   Đóng vai chuyên gia hướng nghiệp để tư vấn thiếu niên. Từ thông tin yêu thích nghề nghiệp của người dùng, đưa ra dự đoán dạng file json:
-1. tính cách (100-150 chữ)
-2. sở thích (50-100 chữ)
-3. môi trường làm việc phù hợp (50-100 chữ)
+1. tính cách (20-50 chữ)
+2. sở thích (15-30 chữ)
+3. môi trường làm việc phù hợp (15-30 chữ)
 4. 5 nghề nên theo đuổi trong tương lai
 
-Định dạng json:
+Định dạng file json:
 {
   "tinh_cach": "",
   "so_thich": "",
@@ -76,7 +76,9 @@ Không thích: Đầu bếp chuyên nghiệp, Giáo viên Tiểu học, Nhạc s
 }
 
 function extractCareerPredictionJSON(text) {
-  const json = JSON.parse(text);
+  // Remove unneeded chars
+  const cleanedText = text.replace(/```json/g, '').replace(/```/g, '');
+  const json = JSON.parse(cleanedText);
   return {
     personality: json.tinh_cach,
     interests: json.so_thich,
