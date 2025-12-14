@@ -75,6 +75,40 @@ Không thích: Đầu bếp chuyên nghiệp, Giáo viên Tiểu học, Nhạc s
   return result;
 }
 
+export async function runGeminiCareerPrediction() {
+  const liked = Array.from(new Set(user.liked.map(i => i.nameVN))).join(', ');
+  const neutral = Array.from(new Set(user.neutral.map(i => i.nameVN))).join(', ');
+  const disliked = Array.from(new Set(user.disliked.map(i => i.nameVN))).join(', ');
+
+  const prompt = `
+  Đóng vai chuyên gia hướng nghiệp để tư vấn thiếu niên. Từ thông tin yêu thích nghề nghiệp của người dùng, đưa ra dự đoán dạng file json:
+1. tính cách (20-50 chữ)
+2. sở thích (15-30 chữ)
+3. môi trường làm việc phù hợp (15-30 chữ)
+4. 5 nghề nên theo đuổi trong tương lai
+
+Định dạng file json:
+{
+  "tinh_cach": "",
+  "so_thich": "",
+  "moi_truong_lam_viec_phu_hop": "",
+  "nghe_nen_theo_duoi": []
+}
+Lưu ý:
+- CẤM chào, hỏi, hoặc đưa ra thông tin không liên quan!
+- Sử dụng nền lý thuyết hướng nghiệp Holland 
+--
+Thông tin yêu thích:
+Thích: ${liked}
+Trung lập: ${neutral}
+Không thích: ${disliked}
+  `
+
+  const result = await callGeminiAI(prompt);
+  // console.log(result);
+  return result;
+}
+
 function extractCareerPredictionJSON(text) {
   // Remove unneeded chars
   const cleanedText = text.replace(/```json/g, '').replace(/```/g, '');
@@ -102,7 +136,7 @@ export async function startAIAnalysis() {
   document.getElementById('btn-ai-analysis').disabled = true;
   document.getElementById('ai-result-container').innerHTML = "<p>AI đang phân tích dữ liệu...</p>";
   try {
-    const result = await testGeminiAI();
+    const result = await runGeminiCareerPrediction();
     if (result.status === 'success') {
       const htmlReport = generateHTMLReport(extractCareerPredictionJSON(result.text));
       document.getElementById('ai-result-container').innerHTML = htmlReport;
