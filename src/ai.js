@@ -1,7 +1,7 @@
-import { readFileSync } from 'fs';
+import { getSecret } from './secret.js';
 
 function getGeminiKey() {
-  return readFileSync('src/key.txt', 'utf8');
+  return getSecret();
 }
 
 async function callGeminiAI(prompt) {
@@ -71,7 +71,30 @@ Không thích: Đầu bếp chuyên nghiệp, Giáo viên Tiểu học, Nhạc s
   `
 
   const result = await callGeminiAI(prompt);
-  console.log(result);
+  // console.log(result);
+  return result;
 }
 
-testGeminiAI();
+export async function startAIAnalysis() {
+  document.getElementById('btn-ai-analysis').innerText = "Đang phân tích...";
+  document.getElementById('btn-ai-analysis').disabled = true;
+  document.getElementById('ai-result-container').innerHTML = "<p>AI đang phân tích dữ liệu...</p>";
+  try {
+    const result = await testGeminiAI();
+    if (result.status === 'success') {
+      document.getElementById('ai-result-container').innerHTML = result.text;
+    } else {
+      document.getElementById('ai-result-container').innerHTML = "Error: " + result.message;
+    }
+  } catch (e) {
+    document.getElementById('ai-result-container').innerHTML = "Error: " + e.message;
+  } finally {
+    document.getElementById('btn-ai-analysis').innerText = "Phân tích bằng AI";
+    document.getElementById('btn-ai-analysis').disabled = false;
+  }
+}
+
+document.getElementById("btn-ai-analysis").addEventListener("click", () => {
+  startAIAnalysis();
+});
+// console.log(getGeminiKey());
