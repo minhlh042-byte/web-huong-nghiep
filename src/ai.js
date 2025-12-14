@@ -45,10 +45,10 @@ async function callGeminiAI(prompt) {
   }
 }
 
-async function testGeminiAI() {
+export async function testGeminiAI() {
   const prompt = `
-  Đóng vai chuyên gia hướng nghiệp để tư vấn thiếu niên. Từ thông tin yêu thích nghề nghiệp của người dùng, đưa ra dự đoán dạng json:
-1. tính cách (100-200 chữ)
+  Đóng vai chuyên gia hướng nghiệp để tư vấn thiếu niên. Từ thông tin yêu thích nghề nghiệp của người dùng, đưa ra dự đoán dạng file json:
+1. tính cách (100-150 chữ)
 2. sở thích (50-100 chữ)
 3. môi trường làm việc phù hợp (50-100 chữ)
 4. 5 nghề nên theo đuổi trong tương lai
@@ -75,6 +75,26 @@ Không thích: Đầu bếp chuyên nghiệp, Giáo viên Tiểu học, Nhạc s
   return result;
 }
 
+function extractCareerPredictionJSON(text) {
+  const json = JSON.parse(text);
+  return {
+    personality: json.tinh_cach,
+    interests: json.so_thich,
+    work_environment: json.moi_truong_lam_viec_phu_hop,
+    careers: json.nghe_nen_theo_duoi
+  };
+}
+
+function generateHTMLReport(json) {
+  return `
+  <h3>Kết quả phân tích hướng nghiệp</h3>
+  <p id="ai-result-personality"> <b>Tính cách:</b> ${json.personality}</p>
+  <p id="ai-result-interests"> <b>Sở thích:</b> ${json.interests}</p>
+  <p id="ai-result-work-environment"> <b>Môi trường làm việc phù hợp:</b> ${json.work_environment}</p>
+  <p id="ai-result-careers"> <b>Nghề nên theo đuổi trong tương lai:</b> ${json.careers.join(', ')}</p>
+  `;
+}
+
 export async function startAIAnalysis() {
   document.getElementById('btn-ai-analysis').innerText = "Đang phân tích...";
   document.getElementById('btn-ai-analysis').disabled = true;
@@ -82,7 +102,8 @@ export async function startAIAnalysis() {
   try {
     const result = await testGeminiAI();
     if (result.status === 'success') {
-      document.getElementById('ai-result-container').innerHTML = result.text;
+      const htmlReport = generateHTMLReport(extractCareerPredictionJSON(result.text));
+      document.getElementById('ai-result-container').innerHTML = htmlReport;
     } else {
       document.getElementById('ai-result-container').innerHTML = "Error: " + result.message;
     }
@@ -97,4 +118,3 @@ export async function startAIAnalysis() {
 document.getElementById("btn-ai-analysis").addEventListener("click", () => {
   startAIAnalysis();
 });
-// console.log(getGeminiKey());
