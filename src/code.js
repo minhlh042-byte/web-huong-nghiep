@@ -313,3 +313,6 @@ function restartApp() {
   }
 }
 function quitQuiz() { if(confirm("Thoát?")) goToScreen('screen-home'); }
+
+// DEBUG ONLY
+// finishAndAnalyze()

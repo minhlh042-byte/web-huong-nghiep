@@ -1,49 +1,64 @@
-import { getSecret } from './secret.js';
+// import { getSecret } from './secret.js';
 
-function getGeminiKey() {
-  return getSecret();
+// function getGeminiKey() {
+//   return getSecret();
+// }
+
+const API_URL = 'https://webhuongnghiepbe.vercel.app/api/career-analyser';
+// const API_URL = 'http://localhost:3002/api/career-analyser';
+
+async function callGeminiAPI(prompt) {
+  const response = await fetch(API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Origin': window.location.origin,
+    },
+    body: JSON.stringify({ prompt }),
+  });
+  return response.json();
 }
 
-async function callGeminiAI(prompt) {
-  var key = getGeminiKey();
-  if (!key) {
-    return { status: 'error', message: 'Chưa cấu hình API Key trong Script Properties!' };
-  }
+// async function callGeminiAI(prompt) {
+//   var key = getGeminiKey();
+//   if (!key) {
+//     return { status: 'error', message: 'Chưa cấu hình API Key trong Script Properties!' };
+//   }
 
-  try {
-    var url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=" + key;
+//   try {
+//     var url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=" + key;
     
-    const payload = {
-      "contents": [{
-        "parts": [{ "text": prompt }]
-      }]
-    };
+//     const payload = {
+//       "contents": [{
+//         "parts": [{ "text": prompt }]
+//       }]
+//     };
 
-    const options = {
-      "method": "POST",
-      "contentType": "application/json",
-      "body": JSON.stringify(payload),
-      "muteHttpExceptions": true
-    };
+//     const options = {
+//       "method": "POST",
+//       "contentType": "application/json",
+//       "body": JSON.stringify(payload),
+//       "muteHttpExceptions": true
+//     };
 
-    const response = await fetch(url, options);
-    const json = await response.json();
+//     const response = await fetch(url, options);
+//     const json = await response.json();
 
-    if (json.candidates && json.candidates.length > 0) {
-      return { 
-        status: 'success', 
-        text: json.candidates[0].content.parts[0].text 
-      };
-    } else {
-      console.error(json);
-      return { status: 'error', message: 'AI không phản hồi: ' + JSON.stringify(json) };
-    }
+//     if (json.candidates && json.candidates.length > 0) {
+//       return { 
+//         status: 'success', 
+//         text: json.candidates[0].content.parts[0].text 
+//       };
+//     } else {
+//       console.error(json);
+//       return { status: 'error', message: 'AI không phản hồi: ' + JSON.stringify(json) };
+//     }
 
-  } catch (e) {
-    console.error(e);
-    return { status: 'error', message: 'Lỗi Server: ' + e.toString() };
-  }
-}
+//   } catch (e) {
+//     console.error(e);
+//     return { status: 'error', message: 'Lỗi Server: ' + e.toString() };
+//   }
+// }
 
 export async function testGeminiAI() {
   const prompt = `
@@ -70,7 +85,7 @@ Trung lập: Hướng dẫn viên Du lịch, Kiến trúc sư Cảnh quan, Kế 
 Không thích: Đầu bếp chuyên nghiệp, Giáo viên Tiểu học, Nhạc sĩ, Thủ thư
   `
 
-  const result = await callGeminiAI(prompt);
+  const result = await callGeminiAPI(prompt);
   // console.log(result);
   return result;
 }
@@ -104,7 +119,7 @@ Trung lập: ${neutral}
 Không thích: ${disliked}
   `
 
-  const result = await callGeminiAI(prompt);
+  const result = await callGeminiAPI(prompt);
   // console.log(result);
   return result;
 }
@@ -137,6 +152,7 @@ export async function startAIAnalysis() {
   document.getElementById('ai-result-container').innerHTML = "<p>AI đang phân tích dữ liệu...</p>";
   try {
     const result = await runGeminiCareerPrediction();
+    // const result = await testGeminiAI();
     if (result.status === 'success') {
       const htmlReport = generateHTMLReport(extractCareerPredictionJSON(result.text));
       document.getElementById('ai-result-container').innerHTML = htmlReport;
