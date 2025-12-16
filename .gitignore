@@ -12,3 +12,6 @@ Thumbs.db
 
 temp
 archive/
+temp.txt
+doc.md
+.cursorignore
